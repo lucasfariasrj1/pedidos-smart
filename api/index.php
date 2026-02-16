@@ -20,7 +20,6 @@ require_once __DIR__ . '/controllers/UsuarioController.php';
 require_once __DIR__ . '/controllers/LojaController.php';
 require_once __DIR__ . '/controllers/SettingController.php';
 
-$url = isset($_GET['url']) ? explode('/', trim($_GET['url'], '/')) : [];
 $recurso = $url[0] ?? null;
 $id = isset($url[1]) ? (int)$url[1] : null;
 $subrecurso = $url[1] ?? null;

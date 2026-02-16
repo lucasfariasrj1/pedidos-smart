@@ -33,7 +33,7 @@
     </div>
 
     <script>
-      const apiLoginUrl = '../api/index.php?url=login';
+      const apiLoginUrl = '../api/login';
 
       function decodeJwt(token) {
         try {
@@ -70,7 +70,7 @@
 
           message.className = 'mt-3 small text-success';
           message.textContent = 'Login realizado com sucesso. Redirecionando...';
-          window.location.href = 'index.php';
+          window.location.href = 'index';
         } catch (error) {
           message.className = 'mt-3 small text-danger';
           message.textContent = error.message;

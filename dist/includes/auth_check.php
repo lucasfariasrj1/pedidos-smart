@@ -28,7 +28,7 @@ function decodeJwtPayload(string $jwt): ?array
 $token = $_SESSION['jwt_token'] ?? $_COOKIE['jwt_token'] ?? null;
 
 if (!$token) {
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
@@ -36,7 +36,7 @@ $payload = decodeJwtPayload($token);
 if (!$payload || (!empty($payload['exp']) && (int)$payload['exp'] < time())) {
     setcookie('jwt_token', '', time() - 3600, '/');
     unset($_SESSION['jwt_token'], $_SESSION['user_payload']);
-    header('Location: login.php');
+    header('Location: login');
     exit;
 }
 
@@ -54,12 +54,12 @@ $userAllowedPages = ['pedidos.php', 'historicoPedidos.php', 'index.php'];
 
 if ($role !== 'admin' && in_array($currentPage, $adminOnlyPages, true)) {
     http_response_code(403);
-    header('Location: pedidos.php');
+    header('Location: pedidos');
     exit;
 }
 
 if ($role !== 'admin' && !in_array($currentPage, $userAllowedPages, true)) {
     http_response_code(403);
-    header('Location: pedidos.php');
+    header('Location: pedidos');
     exit;
 }
