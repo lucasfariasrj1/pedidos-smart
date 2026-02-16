@@ -52,6 +52,22 @@ $isAdminUser = function_exists('isAdmin') ? isAdmin() : false;
   </div>
 </div>
 
+
+<div class="modal fade" id="systemAlertModal" tabindex="-1" aria-labelledby="systemAlertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="systemAlertModalLabel">Aviso do sistema</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" id="systemAlertModalBody"></div>
+      <div class="modal-footer" id="systemAlertModalFooter">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .bottom-nav {
     z-index: 1040;
@@ -116,6 +132,70 @@ $isAdminUser = function_exists('isAdmin') ? isAdmin() : false;
       });
     });
   }
+
+
+  window.showSystemAlert = function(type, title, message) {
+    const modalEl = document.getElementById('systemAlertModal');
+    if (!modalEl || !window.bootstrap?.Modal) return;
+
+    const label = document.getElementById('systemAlertModalLabel');
+    const body = document.getElementById('systemAlertModalBody');
+    const footer = document.getElementById('systemAlertModalFooter');
+
+    label.textContent = title || 'Aviso do sistema';
+    body.textContent = message || '';
+
+    const okClass = type === 'error' ? 'btn-danger' : (type === 'warning' ? 'btn-warning' : 'btn-primary');
+    footer.innerHTML = '<button type="button" class="btn ' + okClass + '" data-bs-dismiss="modal">OK</button>';
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  };
+
+  window.showSystemConfirm = function(title, message, onConfirm) {
+    const modalEl = document.getElementById('systemAlertModal');
+    if (!modalEl || !window.bootstrap?.Modal) return;
+
+    const label = document.getElementById('systemAlertModalLabel');
+    const body = document.getElementById('systemAlertModalBody');
+    const footer = document.getElementById('systemAlertModalFooter');
+
+    label.textContent = title || 'Confirmar ação';
+    body.textContent = message || 'Confirma esta ação?';
+    footer.innerHTML = '';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.setAttribute('data-bs-dismiss', 'modal');
+    cancelBtn.textContent = 'Cancelar';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'btn btn-danger';
+    confirmBtn.textContent = 'Confirmar';
+
+    const modal = new bootstrap.Modal(modalEl);
+
+    confirmBtn.addEventListener('click', function() {
+      modal.hide();
+      if (typeof onConfirm === 'function') onConfirm();
+    }, { once: true });
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(confirmBtn);
+    modal.show();
+  };
+
+
+  document.querySelectorAll('.js-confirm-form').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const title = form.getAttribute('data-confirm-title') || 'Confirmar ação';
+      const message = form.getAttribute('data-confirm-message') || 'Deseja continuar?';
+      showSystemConfirm(title, message, () => form.submit());
+    });
+  });
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

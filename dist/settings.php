@@ -18,11 +18,7 @@ $userMe = $userMeResponse['ok'] && is_array($userMeResponse['data']) ? $userMeRe
                 <h3 class="card-title">Dados do usuário autenticado (GET /auth/users/me)</h3>
             </div>
             <div class="card-body">
-                <?php if (!$userMeResponse['ok']): ?>
-                    <div class="alert alert-danger mb-0">
-                        <?= htmlspecialchars((string) ($userMeResponse['data']['error'] ?? 'Falha ao carregar dados do usuário.'), ENT_QUOTES, 'UTF-8'); ?>
-                    </div>
-                <?php else: ?>
+                <?php if ($userMeResponse['ok']): ?>
                     <div class="row g-3">
                         <div class="col-md-4"><label class="form-label fw-bold">ID</label><input class="form-control" value="<?= (int) ($userMe['id'] ?? 0); ?>" readonly></div>
                         <div class="col-md-4"><label class="form-label fw-bold">E-mail</label><input class="form-control" value="<?= htmlspecialchars((string) ($userMe['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" readonly></div>
@@ -36,3 +32,7 @@ $userMe = $userMeResponse['ok'] && is_array($userMeResponse['data']) ? $userMeRe
         </div>
     </div>
 </div>
+
+<?php if (!$userMeResponse['ok']): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('error', 'Configurações', <?= json_encode((string) ($userMeResponse['data']['error'] ?? 'Falha ao carregar dados do usuário.'), JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>

@@ -58,9 +58,6 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
 
 <div class="app-content">
     <div class="container-fluid">
-        <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
-        <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
-
         <div class="card mb-3">
             <div class="card-body">
                 <form method="POST" class="row g-2">
@@ -98,7 +95,7 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
                                         <button class="btn btn-sm btn-outline-primary" type="submit">Salvar</button>
                                     </form>
                                 </details>
-                                <form method="POST" class="mt-1" onsubmit="return confirm('Remover fornecedor?');">
+                                <form method="POST" class="mt-1 js-confirm-form" data-confirm-title="Remover fornecedor" data-confirm-message="Tem certeza que deseja remover este fornecedor?">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= (int) ($fornecedor['id'] ?? 0); ?>">
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
@@ -112,3 +109,10 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
         </div>
     </div>
 </div>
+
+<?php if ($message): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('success', 'Fornecedores', <?= json_encode($message, JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>
+<?php if ($error): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('error', 'Fornecedores', <?= json_encode($error, JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>

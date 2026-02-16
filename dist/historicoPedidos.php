@@ -44,9 +44,6 @@ $orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersRe
 
 <div class="app-content">
     <div class="container-fluid">
-        <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
-        <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
-
         <div class="card shadow-sm">
             <div class="card-body table-responsive p-0">
                 <table class="table table-striped align-middle mb-0">
@@ -81,7 +78,7 @@ $orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersRe
                                         </form>
                                     </td>
                                     <td class="text-center">
-                                        <form method="POST" onsubmit="return confirm('Remover pedido?');">
+                                        <form method="POST" class="js-confirm-form" data-confirm-title="Remover pedido" data-confirm-message="Tem certeza que deseja remover este pedido?">
                                             <input type="hidden" name="action" value="delete_order">
                                             <input type="hidden" name="order_id" value="<?= (int) ($order['id'] ?? 0); ?>">
                                             <button class="btn btn-outline-danger btn-sm" type="submit"><i class="bi bi-trash"></i></button>
@@ -96,3 +93,10 @@ $orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersRe
         </div>
     </div>
 </div>
+
+<?php if ($message): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('success', 'Pedidos', <?= json_encode($message, JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>
+<?php if ($error): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('error', 'Pedidos', <?= json_encode($error, JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>

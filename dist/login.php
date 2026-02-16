@@ -43,12 +43,6 @@ if ($reason === 'expired_token' && empty($loginError)) {
         <div class="card-body login-card-body rounded">
           <p class="login-box-msg fw-bold">Acesse sua conta para gerenciar pedidos</p>
 
-          <?php if (!empty($loginError)): ?>
-            <div class="alert alert-danger py-2 small mb-3" role="alert">
-              <?= htmlspecialchars($loginError, ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-          <?php endif; ?>
-
           <form method="POST" action="">
             <div class="input-group mb-3">
               <input type="email" name="email" class="form-control" placeholder="E-mail" required autofocus />
@@ -76,6 +70,10 @@ if ($reason === 'expired_token' && empty($loginError)) {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="<?= rtrim(BASE_URL, '/') ?>/dist/js/adminlte.js"></script>
+    <?php if (!empty($loginError)): ?>
+    <script>document.addEventListener('DOMContentLoaded', function(){ if (window.showSystemAlert) { showSystemAlert('error', 'Login', <?= json_encode($loginError, JSON_UNESCAPED_UNICODE); ?>); } });</script>
+    <?php endif; ?>
+
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
