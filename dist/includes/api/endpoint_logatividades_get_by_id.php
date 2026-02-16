@@ -5,7 +5,7 @@ function endpointLogatividadesGetById(string $token, int $id): array
     $curl = curl_init();
 
     curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://api.assistenciasmarthard.com.br/logatividades/' . $id,
+        CURLOPT_URL => 'https://api.assistenciasmarthard.com.br/auth/logatividades/' . $id,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
