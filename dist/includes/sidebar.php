@@ -26,7 +26,7 @@
         </li>
 
         <li class="nav-item">
-          <a href="/historicoPedido.php" class="nav-link {{ request()->is('pedidos') ? 'active' : '' }}">
+          <a href="/historicoPedidos.php" class="nav-link {{ request()->is('historicoPedidos*') ? 'active' : '' }}">
             <i class="nav-icon bi bi-clock-history"></i>
             <p>Histórico de Pedidos</p>
           </a>
