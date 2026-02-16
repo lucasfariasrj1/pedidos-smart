@@ -72,7 +72,7 @@
 
     <script>
       // Endpoint ajustado para o formato sem URL amigável
-      const apiLoginUrl = '<?= BASE_URL ?>api/index.php?url=login';
+      const apiLoginUrl = '/api/index.php?url=login';
 
       document.getElementById('login-form').addEventListener('submit', async (event) => {
         event.preventDefault();
