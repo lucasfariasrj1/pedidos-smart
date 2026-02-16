@@ -11,9 +11,9 @@ DirectoryIndex index.php
     # --- INÍCIO DOS DIRECIONAMENTOS ESPECÍFICOS ---
     RewriteRule ^home/?$ index.php [NC,L]
     RewriteRule ^historicoPedidos/?$ historyPedidos.php [NC,L]
-    RewriteRule ^pedidos/?$ pedidos.php [NC,L]
+    RewriteRule ^pedidos/?$ /pedidos.php [NC,L]
 
-    RewriteRule ^users/?$ usuarios.php [NC,L]
+    RewriteRule ^users/?$ /usuarios.php [NC,L]
     RewriteRule ^fornecedores/?$ fornecedores.php [NC,L]
     RewriteRule ^configuracoes/?$ settings.php [NC,L]
     RewriteRule ^logs/?$ logs.php [NC,L]
