@@ -1,5 +1,7 @@
 <?php
 // config.php
+define('BASE_URL', 'https://pedidos.assistenciasmarthard.com.br/');
+
 if (!defined('BASE_URL')) {
     // Detecta se é HTTP ou HTTPS
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";

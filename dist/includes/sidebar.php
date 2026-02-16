@@ -10,7 +10,7 @@
       <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false" id="navigation">
         
         <li class="nav-item">
-          <a href="./" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+          <a href="index.php?page=dashboard" class="nav-link <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-speedometer2"></i>
             <p>Dashboard</p>
           </a>
@@ -19,14 +19,14 @@
         <li class="nav-header">OPERAÇÃO</li>
 
         <li class="nav-item">
-          <a href="/pedidos.php" class="nav-link {{ request()->is('pedidos/novo') ? 'active' : '' }}">
+          <a href="index.php?page=pedidos" class="nav-link <?php echo ($_GET['page'] ?? '') === 'pedidos' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-plus-circle-fill"></i>
             <p>Fazer Pedido</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="/historicoPedidos.php" class="nav-link {{ request()->is('historicoPedidos*') ? 'active' : '' }}">
+          <a href="index.php?page=history-pedidos" class="nav-link <?php echo ($_GET['page'] ?? '') === 'history-pedidos' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-clock-history"></i>
             <p>Histórico de Pedidos</p>
           </a>
@@ -35,7 +35,7 @@
         <li class="nav-header">GERENCIAMENTO</li>
 
         <li class="nav-item">
-          <a href="/fornecedores.php" class="nav-link {{ request()->is('fornecedores*') ? 'active' : '' }}">
+          <a href="index.php?page=fornecedores" class="nav-link <?php echo ($_GET['page'] ?? '') === 'fornecedores' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-truck"></i>
             <p>Fornecedores</p>
           </a>
@@ -52,19 +52,19 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="/usuarios.php" class="nav-link {{ request()->is('admin/usuarios*') ? 'active' : '' }}">
+              <a href="index.php?page=usuarios" class="nav-link <?php echo ($_GET['page'] ?? '') === 'usuarios' ? 'active' : ''; ?>">
                 <i class="nav-icon bi bi-people"></i>
                 <p>Usuários e Lojas</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="/logs.php" class="nav-link {{ request()->is('admin/logs*') ? 'active' : '' }}">
+              <a href="index.php?page=logs" class="nav-link <?php echo ($_GET['page'] ?? '') === 'logs' ? 'active' : ''; ?>">
                 <i class="nav-icon bi bi-journal-text"></i>
                 <p>Logs de Atividade</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="/settings.php" class="nav-link {{ request()->is('admin/configuracoes*') ? 'active' : '' }}">
+              <a href="index.php?page=settings" class="nav-link <?php echo ($_GET['page'] ?? '') === 'settings' ? 'active' : ''; ?>">
                 <i class="nav-icon bi bi-gear"></i>
                 <p>Configurações</p>
               </a>
