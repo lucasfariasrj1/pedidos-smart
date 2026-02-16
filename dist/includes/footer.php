@@ -1,6 +1,9 @@
       <footer class="app-footer">
         <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
+        <div class="float-end d-none d-sm-inline">
+                  Desenvolvido por <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
+
+        </div>
         <!--end::To the end-->
         <!--begin::Copyright-->
         <strong>
@@ -11,8 +14,6 @@
         <br />
         <p>
           <strong>Version</strong>  1.0.0
-        <p>
-        Desenvolvido por <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
         </p>
         <!--end::Copyright-->
       </footer>
