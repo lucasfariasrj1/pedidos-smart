@@ -1,154 +1,150 @@
-<?php include_once __DIR__ . '/includes/header.php'; ?>
+<?php
+require_once __DIR__ . '/includes/auth_check.php';
+require_once __DIR__ . '/includes/api_helper.php';
+
+$alert = null;
+
+$meResponse = callApi('GET', '/auth/users/me');
+if (($meResponse['status'] ?? 0) === 401) {
+    redirectToLogin();
+}
+$currentUser = apiData($meResponse);
+if (!is_array($currentUser)) {
+    $currentUser = [];
+}
+$isAdmin = ($currentUser['role'] ?? '') === 'admin';
+$userLojaId = (int) ($currentUser['loja_id'] ?? 0);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    $pedidoId = (int) ($_POST['pedido_id'] ?? 0);
+
+    if (!$isAdmin) {
+        $alert = ['type' => 'danger', 'message' => 'Seu perfil não possui permissão para alterar pedidos.'];
+    } elseif ($action === 'update_status') {
+        $status = trim((string) ($_POST['status'] ?? ''));
+        $response = callApi('PUT', '/auth/orders/' . $pedidoId, ['status' => $status]);
+        if (($response['status'] ?? 0) === 401) {
+            redirectToLogin();
+        }
+        $alert = $response['ok']
+            ? ['type' => 'success', 'message' => 'Status atualizado com sucesso.']
+            : ['type' => 'danger', 'message' => apiMessage($response, 'Erro ao atualizar status.')];
+    } elseif ($action === 'delete_order') {
+        $response = callApi('DELETE', '/auth/orders/' . $pedidoId);
+        if (($response['status'] ?? 0) === 401) {
+            redirectToLogin();
+        }
+        $alert = $response['ok']
+            ? ['type' => 'success', 'message' => 'Pedido excluído com sucesso.']
+            : ['type' => 'danger', 'message' => apiMessage($response, 'Erro ao excluir pedido.')];
+    }
+}
+
+$ordersResponse = callApi('GET', '/auth/orders');
+if (($ordersResponse['status'] ?? 0) === 401) {
+    redirectToLogin();
+}
+$pedidos = apiData($ordersResponse);
+if (!is_array($pedidos)) {
+    $pedidos = [];
+}
+
+if (!$isAdmin) {
+    $pedidos = array_values(array_filter($pedidos, static function ($pedido) use ($userLojaId) {
+        return (int) ($pedido['loja_id'] ?? 0) === $userLojaId;
+    }));
+}
+
+include_once __DIR__ . '/includes/header.php';
+?>
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
+<div class="app-wrapper">
+    <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
+
+    <main class="app-main">
+        <div class="app-content-header">
             <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
-                    </li>
-                    <li class="nav-item d-none d-md-block"><a href="pedidos" class="nav-link">Fazer Pedido</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i>
-                            <span class="d-none d-md-inline">Marcos Paulo</span>
-                        </a>
-                    </li>
-                </ul>
+                <h3 class="mb-0">Histórico de Pedidos</h3>
             </div>
-        </nav>
-        
-        <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
-        
-        <main class="app-main">
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Histórico de Pedidos</h3>
-                            <p class="text-secondary small">Visualizando pedidos da: <strong>LOJA 1 - SÃO JUDAS</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
 
-            <div class="app-content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-header border-0">
-                                    <h3 class="card-title fw-bold">Pedidos Recentes</h3>
-                                </div>
-                                <div class="card-body table-responsive p-0">
-                                    <table class="table table-striped align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 80px">ID</th>
-                                                <th>Data</th>
-                                                <th>Modelo / Peça</th>
-                                                <th>Qtd.</th>
-                                                <th>Fornecedor</th>
-                                                <th>Total (R$)</th>
-                                                <th class="text-center">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><span class="text-secondary">#1052</span></td>
-                                                <td>15/02/2026</td>
-                                                <td>
-                                                    <span class="fw-bold">iPhone 14 Pro Max</span><br>
-                                                    <small class="text-muted">Tela OLED Incell</small>
-                                                </td>
-                                                <td>1</td>
-                                                <td>Leo Peças</td>
-                                                <td>R$ 450,00</td>
-                                                <td class="text-center">
-                                                    <div class="btn-group">
-                                                        <button class="btn btn-outline-primary btn-sm" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#modalDetalhes1052" 
-                                                                title="Ver Detalhes">
-                                                            <i class="bi bi-search"></i>
-                                                        </button>
-                                                        
-                                                        <?php 
-                                                            $zap_fornecedor = "5511999999999"; 
-                                                            $msg = urlencode("*Novo Pedido de Compra*\n\n*Pedido:* #1052\n*Loja:* São Judas\n*Item:* Tela OLED iPhone 14 Pro Max\n*Qtd:* 1\n*Preço:* R$ 450,00");
-                                                        ?>
-                                                        <a href="https://api.whatsapp.com/send?phone=<?= $zap_fornecedor ?>&text=<?= $msg ?>" 
-                                                           target="_blank" class="btn btn-success btn-sm">
-                                                            <i class="bi bi-whatsapp"></i> WhatsApp
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <?php if ($alert): ?>
+                    <div class="alert alert-<?= $alert['type'] ?> alert-dismissible fade show" role="alert">
+                        <?= htmlspecialchars($alert['message'], ENT_QUOTES, 'UTF-8') ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                </div>
-            </div>
-        </main>
+                <?php endif; ?>
 
-        <div class="modal fade" id="modalDetalhes1052" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="exampleModalLabel"> Detalhes do Pedido #1052</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="text-muted small d-block">Loja Requisitante</label>
-                                <span class="fw-bold">Loja 1 - São Judas</span>
-                            </div>
-                            <div class="col-6 text-end">
-                                <label class="text-muted small d-block">Data do Pedido</label>
-                                <span class="fw-bold">15/02/2026</span>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="mb-3">
-                            <label class="text-muted small d-block">Aparelho / Modelo</label>
-                            <p class="mb-0 fw-bold text-primary">iPhone 14 Pro Max</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted small d-block">Peça Solicitada</label>
-                            <p class="mb-0 fw-bold">Tela OLED Incell (Preta)</p>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-4">
-                                <label class="text-muted small d-block">Quantidade</label>
-                                <span class="badge bg-secondary">1 unidade</span>
-                            </div>
-                            <div class="col-8 text-end">
-                                <label class="text-muted small d-block">Fornecedor Selecionado</label>
-                                <span class="fw-bold">Leo Peças</span>
-                            </div>
-                        </div>
-                        <div class="p-3 bg-light rounded mb-3">
-                            <label class="text-muted small d-block">Observações Técnicas</label>
-                            <p class="mb-0 italic small text-secondary">"Cliente com pressa, verificar se a tela possui o True Tone ativo."</p>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-dark fw-bold">Preço Unitário:</h5>
-                            <h4 class="mb-0 text-success fw-bold">R$ 450,00</h4>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <a href="https://api.whatsapp.com/send?phone=<?= $zap_fornecedor ?>&text=<?= $msg ?>" target="_blank" class="btn btn-success">
-                            <i class="bi bi-whatsapp"></i> Reenviar WhatsApp
-                        </a>
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Peça</th>
+                                <th>Loja</th>
+                                <th>Fornecedor</th>
+                                <th>Status</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php if (empty($pedidos)): ?>
+                                <tr><td colspan="6" class="text-center text-muted py-4">Nenhum pedido encontrado.</td></tr>
+                            <?php endif; ?>
+                            <?php foreach ($pedidos as $pedido): ?>
+                                <tr>
+                                    <td><?= (int) ($pedido['id'] ?? 0) ?></td>
+                                    <td><?= htmlspecialchars((string) ($pedido['peca'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td>#<?= (int) ($pedido['loja_id'] ?? 0) ?></td>
+                                    <td>#<?= (int) ($pedido['fornecedor_id'] ?? 0) ?></td>
+                                    <td>
+                                        <?php if ($isAdmin): ?>
+                                            <form method="POST" class="d-flex gap-2">
+                                                <input type="hidden" name="action" value="update_status">
+                                                <input type="hidden" name="pedido_id" value="<?= (int) ($pedido['id'] ?? 0) ?>">
+                                                <select name="status" class="form-select form-select-sm">
+                                                    <?php
+                                                    $statusAtual = (string) ($pedido['status'] ?? 'pendente');
+                                                    $statusOptions = ['pendente', 'comprado', 'entregue', 'cancelado'];
+                                                    foreach ($statusOptions as $statusOption):
+                                                    ?>
+                                                        <option value="<?= $statusOption ?>" <?= $statusAtual === $statusOption ? 'selected' : '' ?>>
+                                                            <?= ucfirst($statusOption) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <button class="btn btn-sm btn-warning">Salvar</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="badge text-bg-secondary"><?= htmlspecialchars((string) ($pedido['status'] ?? 'pendente'), ENT_QUOTES, 'UTF-8') ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-end">
+                                        <?php if ($isAdmin): ?>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="delete_order">
+                                                <input type="hidden" name="pedido_id" value="<?= (int) ($pedido['id'] ?? 0) ?>">
+                                                <button class="btn btn-sm btn-danger" onclick="return confirm('Deseja excluir este pedido?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="badge text-bg-secondary">Sem permissão</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <?php include_once __DIR__ . '/includes/footer.php'; ?>
+    </main>
+
+    <?php include_once __DIR__ . '/includes/footer.php'; ?>
+</div>
