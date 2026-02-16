@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/auth_check.php';
 
 $url = isset($_GET['url']) ? trim($_GET['url'], '/') : '';
 $userRole = $_SESSION['role'] ?? 'user';
+$currentPage = $url === '' ? 'dashboard' : $url;
 
 $pageTitle = 'Dashboard | SmartHard';
 $pageFile = 'dashboard_home.php';
