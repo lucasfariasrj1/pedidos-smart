@@ -1,25 +1,3 @@
-<?php include_once __DIR__ . '/includes/header.php'; ?>
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
-            <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
-                    </li>
-                    <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Novo Pedido</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
-        <main class="app-main">
             <div class="app-content-header">
                 <div class="container-fluid">
                     <div class="row">
@@ -91,44 +69,4 @@
                     </div>
                 </div>
             </div>
-        </main>
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
-
-<script>
-// Preenche select de fornecedores e submete o formulário via /api
-async function loadFornecedores(){
-    const sel = document.getElementById('fornecedorSelect');
-    sel.innerHTML = '<option value="">Carregando...</option>';
-    try{
-        const res = await fetch('/api/fornecedores/index.php', { credentials: 'same-origin' });
-        const data = await res.json();
-        sel.innerHTML = '<option value="">Selecione um fornecedor</option>' + (data.map ? data.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('') : '');
-    }catch(e){ sel.innerHTML = '<option value="">Erro ao carregar fornecedores</option>'; }
-}
-
-document.getElementById('pedido-form').addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const btn = document.getElementById('btnSubmitPedido');
-    btn.disabled = true;
-    const form = e.currentTarget;
-    const payload = Object.fromEntries(new FormData(form).entries());
-    try{
-        const res = await fetch('/api/orders/index.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ peca: payload.nome_peca || payload.modelo_celular || '', fornecedor_id: parseInt(payload.fornecedor_id||0), observacao: payload.observacoes || '' })
-        });
-        if (!res.ok) {
-            const err = await res.json().catch(()=>({error:'Erro'}));
-            alert('Erro ao criar pedido: ' + (err.error||err.message||JSON.stringify(err)));
-        } else {
-            alert('Pedido criado com sucesso.');
-            form.reset();
-        }
-    }catch(err){ alert('Erro ao conectar com o servidor.'); }
-    btn.disabled = false;
-});
-
-loadFornecedores();
-</script>
+        

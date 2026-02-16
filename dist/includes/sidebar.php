@@ -1,16 +1,18 @@
+<?php
+$baseUrl = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+$currentRoute = $url ?? '';
+?>
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
   <div class="sidebar-brand">
-    <a href="{{ route('dashboard') }}" class="brand-link">
-      <!-- <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="brand-image opacity-75 shadow" /> -->
+    <a href="<?= $baseUrl; ?>/dashboard" class="brand-link">
       <span class="brand-text fw-light">Sistema de Pedidos</span>
     </a>
   </div>
   <div class="sidebar-wrapper">
     <nav class="mt-2">
-      <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false" id="navigation">
-        
+      <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
         <li class="nav-item">
-          <a href="dashboard" class="nav-link <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'active' : ''; ?>">
+          <a href="<?= $baseUrl; ?>/dashboard" class="nav-link <?= ($currentRoute === '' || $currentRoute === 'dashboard') ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-speedometer2"></i>
             <p>Dashboard</p>
           </a>
@@ -19,14 +21,14 @@
         <li class="nav-header">OPERAÇÃO</li>
 
         <li class="nav-item">
-          <a href="pedidos" class="nav-link <?php echo ($_GET['page'] ?? '') === 'pedidos' ? 'active' : ''; ?>">
+          <a href="<?= $baseUrl; ?>/pedidos" class="nav-link <?= $currentRoute === 'pedidos' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-plus-circle-fill"></i>
             <p>Fazer Pedido</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="history-pedidos" class="nav-link <?php echo ($_GET['page'] ?? '') === 'history-pedidos' ? 'active' : ''; ?>">
+          <a href="<?= $baseUrl; ?>/history-pedidos" class="nav-link <?= $currentRoute === 'history-pedidos' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-clock-history"></i>
             <p>Histórico de Pedidos</p>
           </a>
@@ -35,55 +37,33 @@
         <li class="nav-header">GERENCIAMENTO</li>
 
         <li class="nav-item">
-          <a href="fornecedores" class="nav-link <?php echo ($_GET['page'] ?? '') === 'fornecedores' ? 'active' : ''; ?>">
+          <a href="<?= $baseUrl; ?>/fornecedores" class="nav-link <?= $currentRoute === 'fornecedores' ? 'active' : ''; ?>">
             <i class="nav-icon bi bi-truck"></i>
             <p>Fornecedores</p>
           </a>
         </li>
 
-        <!-- @if(auth()->user()->role === 'admin') -->
-        <li class="nav-item {{ request()->is('admin/*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link">
-            <i class="nav-icon bi bi-shield-lock-fill"></i>
-            <p>
-              Administração
-              <i class="nav-arrow bi bi-chevron-right"></i>
-            </p>
+        <li class="nav-item">
+          <a href="<?= $baseUrl; ?>/usuarios" class="nav-link <?= $currentRoute === 'usuarios' ? 'active' : ''; ?>">
+            <i class="nav-icon bi bi-people"></i>
+            <p>Usuários e Lojas</p>
           </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="/usuarios" class="nav-link <?php echo ($_GET['page'] ?? '') === 'usuarios' ? 'active' : ''; ?>">
-                <i class="nav-icon bi bi-people"></i>
-                <p>Usuários e Lojas</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="logs" class="nav-link <?php echo ($_GET['page'] ?? '') === 'logs' ? 'active' : ''; ?>">
-                <i class="nav-icon bi bi-journal-text"></i>
-                <p>Logs de Atividade</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="settings" class="nav-link <?php echo ($_GET['page'] ?? '') === 'settings' ? 'active' : ''; ?>">
-                <i class="nav-icon bi bi-gear"></i>
-                <p>Configurações</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <!-- @endif -->
-
-        <li class="nav-item mt-3">
-            <form method="POST" action="{{ route('logout') }}">
-                <!-- @csrf -->
-                <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
-                    <i class="nav-icon bi bi-box-arrow-right text-danger"></i>
-                    <p class="text-danger">Sair do Sistema</p>
-                </button>
-            </form>
         </li>
 
+        <li class="nav-item">
+          <a href="<?= $baseUrl; ?>/logs" class="nav-link <?= $currentRoute === 'logs' ? 'active' : ''; ?>">
+            <i class="nav-icon bi bi-journal-text"></i>
+            <p>Logs de Atividade</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="<?= $baseUrl; ?>/settings" class="nav-link <?= $currentRoute === 'settings' ? 'active' : ''; ?>">
+            <i class="nav-icon bi bi-gear"></i>
+            <p>Configurações</p>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>
-  </aside>
+</aside>

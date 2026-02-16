@@ -1,79 +1,68 @@
 <?php
-// dist/index.php
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/auth_check.php';
 
-// Limpeza da URL para o Nginx
 $url = isset($_GET['url']) ? trim($_GET['url'], '/') : '';
-
-// Dados de Sessão
 $userRole = $_SESSION['role'] ?? 'user';
 
-// Definição de Título e Arquivo
-$pageTitle = "Pedidos SmartHard";
-$pageFile = "dashboard_home.php";
+$pageTitle = 'Dashboard | SmartHard';
+$pageFile = 'dashboard_home.php';
 
 switch ($url) {
     case '':
     case 'dashboard':
-        $pageTitle = "Dashboard | SmartHard";
-        $pageFile = "dashboard_home.php";
+        $pageTitle = 'Dashboard | SmartHard';
+        $pageFile = 'dashboard_home.php';
         break;
     case 'pedidos':
-        $pageTitle = "Pedidos | SmartHard";
-        $pageFile = "pedidos.php";
+        $pageTitle = 'Pedidos | SmartHard';
+        $pageFile = 'pedidos.php';
         break;
     case 'history-pedidos':
-        $pageTitle = "Histórico | SmartHard";
-        $pageFile = "historicoPedidos.php";
+        $pageTitle = 'Histórico de Pedidos | SmartHard';
+        $pageFile = 'historicoPedidos.php';
         break;
     case 'usuarios':
-        $pageFile = ($userRole === 'admin') ? "usuarios.php" : "403.php";
+        $pageTitle = 'Usuários | SmartHard';
+        $pageFile = ($userRole === 'admin') ? 'usuarios.php' : '401.php';
         break;
     case 'fornecedores':
-        $pageFile = ($userRole === 'admin') ? "fornecedores.php" : "403.php";
+        $pageTitle = 'Fornecedores | SmartHard';
+        $pageFile = ($userRole === 'admin') ? 'fornecedores.php' : '401.php';
+        break;
+    case 'logs':
+        $pageTitle = 'Logs | SmartHard';
+        $pageFile = ($userRole === 'admin') ? 'logs.php' : '401.php';
         break;
     case 'settings':
-        $pageFile = "settings.php";
+        $pageTitle = 'Configurações | SmartHard';
+        $pageFile = 'settings.php';
+        break;
+    case '401':
+        $pageTitle = '401 | SmartHard';
+        $pageFile = '401.php';
+        break;
+    case '500':
+        $pageTitle = '500 | SmartHard';
+        $pageFile = '500.php';
         break;
     default:
-        $pageFile = "404.php";
+        $pageTitle = '404 | SmartHard';
+        $pageFile = '404.php';
         break;
 }
 
-// 1. O Header deve vir primeiro, sem nenhum espaço ou "echo" antes dele
 include_once __DIR__ . '/includes/header.php';
-
-// 2. O Sidebar
 include_once __DIR__ . '/includes/sidebar.php';
-
-// 3. Estrutura Principal com classes do AdminLTE 4 (app-main)
 ?>
 <main class="app-main">
-    <div class="app-content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="mb-0"><?php echo str_replace(' | SmartHard', '', $pageTitle); ?></h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-content">
-        <div class="container-fluid">
-            <?php 
-            $fullPath = __DIR__ . '/' . $pageFile;
-            if (file_exists($fullPath)) {
-                include_once $fullPath;
-            } else {
-                echo "<div class='alert alert-danger'>Página não encontrada.</div>";
-            }
-            ?>
-        </div>
-    </div>
-</main>
 <?php
-// 4. Footer
-include_once __DIR__ . '/includes/footer.php';
+$fullPath = __DIR__ . '/' . $pageFile;
+if (file_exists($fullPath)) {
+    include $fullPath;
+} else {
+    include __DIR__ . '/500.php';
+}
 ?>
+</main>
+<?php include_once __DIR__ . '/includes/footer.php';

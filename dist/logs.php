@@ -1,25 +1,3 @@
-<?php include_once __DIR__ . '/includes/header.php'; ?>
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
-            <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
-                    </li>
-                    <li class="nav-item d-none d-md-block"><a href="dashboard" class="nav-link">Home</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="nav-link text-secondary"><i class="bi bi-shield-lock-fill me-1"></i> Auditoria</span>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        
-        <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
-        
-        <main class="app-main">
             <div class="app-content-header">
                 <div class="container-fluid">
                     <div class="row align-items-center">
@@ -140,15 +118,4 @@
                     </div>
                 </div>
             </div>
-        </main>
-
-        <script>
-            function confirmarLimpeza() {
-                if(confirm('Atenção: Deseja realmente remover todos os logs com mais de 30 dias? Esta ação não pode ser desfeita.')) {
-                    // Lógica PHP aqui
-                    alert('Logs antigos removidos com sucesso!');
-                }
-            }
-        </script>
-
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+        
