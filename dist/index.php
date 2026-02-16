@@ -1,68 +1,70 @@
 <?php
 // dist/index.php
-require_once 'config.php';
-require_once 'includes/auth_check.php'; // Garante que $_SESSION['user'] existe ou redireciona
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/auth_check.php';
 
-// O parâmetro 'page' vem da URL via GET (ex: index.php?page=pedidos)
+// Define a página atual ou o dashboard por padrão
 $page = $_GET['page'] ?? 'dashboard';
 
-// Pegamos o papel (role) do usuário da sessão para controle de acesso
+// Recupera dados da sessão protegidos pelo auth_check.php
 $userRole = $_SESSION['role'] ?? 'user';
+$lojaId   = $_SESSION['loja_id'] ?? 0;
 
-// Estrutura do Painel AdminLTE
-include 'includes/header.php';
-include 'includes/sidebar.php';
+// Inclui componentes estruturais do AdminLTE
+include_once __DIR__ . '/includes/header.php';
+include_once __DIR__ . '/includes/sidebar.php';
 
 echo '<main class="app-main">';
 echo '  <div class="app-content-header">';
 echo '    <div class="container-fluid">';
 
+// Caminho absoluto para evitar erros de inclusão
+$pageDir = __DIR__ . '/';
+
 switch ($page) {
     case 'dashboard':
-        include 'dashboard_home.php';
+        include_once $pageDir . 'dashboard_home.php';
         break;
 
     case 'pedidos':
-        // Acesso para Admin (todos) e User (própria loja)
-        include 'pedidos.php';
+        // Todos podem ver a página, o filtro de loja_id será feito dentro do pedidos.php via API
+        include_once $pageDir . 'pedidos.php';
         break;
 
     case 'history-pedidos':
-        include 'historicoPedidos.php';
+        include_once $pageDir . 'historicoPedidos.php';
+        break;
+
+    case 'usuarios':
+        // Restrição de nível de acesso para Admin
+        if ($userRole === 'admin') {
+            include_once $pageDir . 'usuarios.php';
+        } else {
+            echo '<div class="alert alert-danger">Acesso restrito ao Administrador.</div>';
+        }
         break;
 
     case 'fornecedores':
-        // No Swagger, listar é permitido, mas criar/deletar exige admin.
-        // Se quiser que apenas admin veja a página inteira:
+        // Conforme Swagger, admin gerencia fornecedores
         if ($userRole === 'admin') {
-            include 'fornecedores.php';
+            include_once $pageDir . 'fornecedores.php';
         } else {
             echo '<div class="alert alert-warning">Acesso restrito a administradores.</div>';
         }
         break;
 
-    case 'usuarios':
-        // Rota exclusiva admin conforme Swagger (/auth/users/listall)
-        if ($userRole === 'admin') {
-            include 'usuarios.php';
-        } else {
-            echo '<div class="alert alert-danger">Acesso negado.</div>';
-        }
-        break;
-
     case 'settings':
-        // Configurações do perfil (conforme endpoint /auth/users/me)
-        include 'settings.php';
+        include_once $pageDir . 'settings.php';
         break;
 
     case 'logs':
         if ($userRole === 'admin') {
-            include 'logs.php';
+            include_once $pageDir . 'logs.php';
         }
         break;
 
     default:
-        echo '<div class="text-center"><h1>404</h1><p>Página não encontrada.</p></div>';
+        echo '<div class="p-5 text-center"><h2>404</h2><p>Página não encontrada.</p></div>';
         break;
 }
 
@@ -70,5 +72,5 @@ echo '    </div>';
 echo '  </div>';
 echo '</main>';
 
-include 'includes/footer.php';
+include_once __DIR__ . '/includes/footer.php';
 ?>
