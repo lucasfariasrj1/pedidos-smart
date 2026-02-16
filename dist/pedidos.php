@@ -98,7 +98,7 @@ if (!$fornecedoresResponse['ok'] && $feedbackMessage === null) {
                                 <textarea name="observacoes" class="form-control" rows="3" placeholder="Cor, especificação, etc..."></textarea>
                             </div>
 
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label class="form-label fw-bold">Fornecedor</label>
                                 <select id="fornecedorSelect" name="fornecedor_id" class="form-select" required>
                                     <option value="">Selecione...</option>
@@ -106,7 +106,7 @@ if (!$fornecedoresResponse['ok'] && $feedbackMessage === null) {
                                         <option value="<?= (int) ($fornecedor['id'] ?? 0); ?>"><?= htmlspecialchars((string) ($fornecedor['nome'] ?? 'Sem nome'), ENT_QUOTES, 'UTF-8'); ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                            </div>
+                            </div> -->
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Observações</label>
