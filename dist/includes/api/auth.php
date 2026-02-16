@@ -10,9 +10,9 @@ function loginEndpoint(string $email, string $senha): array
     return endpointAuthLogin($email, $senha);
 }
 
-function registerEndpoint(string $email, string $senha, string $role, int $lojaId): array
+function registerEndpoint(string $token, string $email, string $senha, string $role, int $lojaId): array
 {
-    return endpointAuthRegister($email, $senha, $role, $lojaId);
+    return endpointAuthRegister($token, $email, $senha, $role, $lojaId);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && basename($_SERVER['PHP_SELF']) === 'login.php') {
@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && basename($_SERVER['PHP_SELF']) === 
                     $_SESSION['role'] = strtolower((string) ($payload['role'] ?? 'user'));
                     $_SESSION['name'] = $payload['name'] ?? 'Usuário';
                     $_SESSION['email'] = $payload['email'] ?? $email;
+                    $_SESSION['loja_id'] = isset($payload['loja_id']) ? (int) $payload['loja_id'] : null;
                 }
             }
 

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/client.php';
 
-function endpointAuthRegister(string $token, string $email, string $senha, string $role, int $lojaId): array
+function endpointAuthUsersPost(string $token, string $email, string $senha, string $role, int $lojaId): array
 {
     return apiRequest('POST', '/auth/register', [
         'email' => $email,

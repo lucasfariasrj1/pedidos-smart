@@ -1,13 +1,20 @@
 <?php
 require_once __DIR__ . '/includes/api/orders.php';
 
-$token = $_COOKIE['jwt_token'] ?? '';
+$token = (string) ($_COOKIE['jwt_token'] ?? '');
+$userRole = strtolower((string) ($_SESSION['role'] ?? 'user'));
+$userLojaId = isset($_SESSION['loja_id']) ? (int) $_SESSION['loja_id'] : 0;
 $message = null;
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     $orderId = (int) ($_POST['order_id'] ?? 0);
+
+    if (in_array($action, ['delete_order', 'update_status'], true) && $userRole !== 'admin') {
+        include __DIR__ . '/403.php';
+        return;
+    }
 
     if ($action === 'delete_order' && $orderId > 0) {
         $response = ordersDeleteEndpoint($token, $orderId);
@@ -30,7 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $ordersResponse = ordersListEndpoint($token);
-$orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersResponse['data'] : [];
+$ordersRaw = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersResponse['data'] : [];
+$orders = array_values(array_filter($ordersRaw, static function (array $order) use ($userRole, $userLojaId): bool {
+    if ($userRole !== 'user') {
+        return true;
+    }
+
+    return isset($order['loja_id']) && (int) $order['loja_id'] === $userLojaId;
+}));
 ?>
 <div class="app-content-header">
     <div class="container-fluid">
@@ -66,6 +80,7 @@ $orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersRe
                                     <td><?= htmlspecialchars((string) ($order['peca'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?= (int) ($order['fornecedor_id'] ?? 0); ?></td>
                                     <td>
+                                        <?php if ($userRole === 'admin'): ?>
                                         <form method="POST" class="d-flex gap-2">
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="order_id" value="<?= (int) ($order['id'] ?? 0); ?>">
@@ -76,13 +91,20 @@ $orders = $ordersResponse['ok'] && is_array($ordersResponse['data']) ? $ordersRe
                                             </select>
                                             <button class="btn btn-outline-primary btn-sm" type="submit">Salvar</button>
                                         </form>
+                                        <?php else: ?>
+                                            <?= htmlspecialchars((string) ($order['status'] ?? 'Pendente'), ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="text-center">
+                                        <?php if ($userRole === 'admin'): ?>
                                         <form method="POST" class="js-confirm-form" data-confirm-title="Remover pedido" data-confirm-message="Tem certeza que deseja remover este pedido?">
                                             <input type="hidden" name="action" value="delete_order">
                                             <input type="hidden" name="order_id" value="<?= (int) ($order['id'] ?? 0); ?>">
                                             <button class="btn btn-outline-danger btn-sm" type="submit"><i class="bi bi-trash"></i></button>
                                         </form>
+                                        <?php else: ?>
+                                            <span class="badge text-bg-secondary">Sem permissão</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
