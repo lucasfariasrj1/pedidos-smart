@@ -8,8 +8,10 @@
           <a href="#" class="text-decoration-none">Assistencia SmartHard</a>.
         </strong>
         Todos os Direitos Reservados.
-        <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
-
+        <br />
+        <p>
+        Desenvolvido por <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
+        </p>
         <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
