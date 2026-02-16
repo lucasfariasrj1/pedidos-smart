@@ -1,6 +1,7 @@
 <?php
 // config.php
 define('BASE_URL', 'https://pedidos.assistenciasmarthard.com.br/');
+define('API_BASE_URL', 'http://localhost:3000');
 
 if (!defined('BASE_URL')) {
     // Detecta se é HTTP ou HTTPS
