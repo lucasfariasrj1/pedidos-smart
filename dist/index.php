@@ -25,7 +25,7 @@ switch ($page) {
         if ($_SESSION['role'] === 'admin') include 'usuarios.php';
         break;
     case 'fornecedores':
-        include '/fornecedores.php';
+        if ($_SESSION['role'] === 'admin') include '/fornecedores.php';
         break;
     case 'settings':
         if ($_SESSION['role'] === 'admin') include 'settings.php';
