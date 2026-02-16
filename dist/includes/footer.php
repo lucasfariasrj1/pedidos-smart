@@ -9,6 +9,66 @@
   </strong>
   Todos os Direitos Reservados.
 </footer>
+
+<div class="d-md-none border-top fixed-bottom d-flex justify-content-around align-items-center py-2 shadow-lg bottom-nav bg-body">
+  <a href="<?= $baseUrl; ?>/dashboard" class="text-center text-decoration-none bottom-nav-link <?= ($currentPage === 'dashboard') ? 'active' : ''; ?>" aria-label="Início">
+    <i class="bi bi-house-door fs-4"></i>
+    <span>Início</span>
+  </a>
+  <a href="<?= $baseUrl; ?>/pedidos" class="text-center text-decoration-none bottom-nav-link <?= ($currentPage === 'pedidos') ? 'active' : ''; ?>" aria-label="Pedidos">
+    <i class="bi bi-cart fs-4"></i>
+    <span>Pedidos</span>
+  </a>
+  <a href="<?= $baseUrl; ?>/fornecedores" class="text-center text-decoration-none bottom-nav-link <?= ($currentPage === 'fornecedores') ? 'active' : ''; ?>" aria-label="Fornecedores">
+    <i class="bi bi-truck fs-4"></i>
+    <span>Fornecedores</span>
+  </a>
+  <a href="<?= $baseUrl; ?>/settings" class="text-center text-decoration-none bottom-nav-link <?= ($currentPage === 'settings') ? 'active' : ''; ?>" aria-label="Perfil">
+    <i class="bi bi-person fs-4"></i>
+    <span>Perfil</span>
+  </a>
+</div>
+
+<style>
+  .bottom-nav {
+    z-index: 1040;
+  }
+
+  .bottom-nav-link {
+    min-width: 70px;
+    color: var(--bs-secondary-color);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .bottom-nav-link span {
+    display: block;
+    font-size: 0.7rem;
+    line-height: 1;
+    margin-top: 0.1rem;
+  }
+
+  .bottom-nav-link.active {
+    color: var(--bs-primary);
+  }
+
+  .bottom-nav-link:active {
+    transform: scale(0.92);
+  }
+
+  @media (max-width: 767.98px) {
+    .app-sidebar {
+      display: none !important;
+    }
+
+    .app-main {
+      padding-bottom: 78px !important;
+    }
+
+    .app-wrapper .app-main {
+      margin-left: 0 !important;
+    }
+  }
+</style>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
