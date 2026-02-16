@@ -1,43 +1,74 @@
 <?php
 // dist/index.php
 require_once 'config.php';
-require_once 'includes/auth_check.php'; // Protege as páginas
+require_once 'includes/auth_check.php'; // Garante que $_SESSION['user'] existe ou redireciona
 
+// O parâmetro 'page' vem da URL via GET (ex: index.php?page=pedidos)
 $page = $_GET['page'] ?? 'dashboard';
 
-// Estrutura do AdminLTE
+// Pegamos o papel (role) do usuário da sessão para controle de acesso
+$userRole = $_SESSION['role'] ?? 'user';
+
+// Estrutura do Painel AdminLTE
 include 'includes/header.php';
 include 'includes/sidebar.php';
 
-echo '<main class="app-main"><div class="app-content-header"><div class="container-fluid">';
+echo '<main class="app-main">';
+echo '  <div class="app-content-header">';
+echo '    <div class="container-fluid">';
 
 switch ($page) {
     case 'dashboard':
-        include './dashboard_home.php'; // Crie este ficheiro com o conteúdo da home
+        include 'dashboard_home.php';
         break;
+
     case 'pedidos':
-        include './pedidos.php';
+        // Acesso para Admin (todos) e User (própria loja)
+        include 'pedidos.php';
         break;
+
     case 'history-pedidos':
         include 'historicoPedidos.php';
         break;
-    case 'usuarios':
-        if ($_SESSION['role'] === 'admin') include 'usuarios.php';
-        break;
+
     case 'fornecedores':
-        if ($_SESSION['role'] === 'admin') include '/fornecedores.php';
+        // No Swagger, listar é permitido, mas criar/deletar exige admin.
+        // Se quiser que apenas admin veja a página inteira:
+        if ($userRole === 'admin') {
+            include 'fornecedores.php';
+        } else {
+            echo '<div class="alert alert-warning">Acesso restrito a administradores.</div>';
+        }
         break;
+
+    case 'usuarios':
+        // Rota exclusiva admin conforme Swagger (/auth/users/listall)
+        if ($userRole === 'admin') {
+            include 'usuarios.php';
+        } else {
+            echo '<div class="alert alert-danger">Acesso negado.</div>';
+        }
+        break;
+
     case 'settings':
-        if ($_SESSION['role'] === 'admin') include 'settings.php';
+        // Configurações do perfil (conforme endpoint /auth/users/me)
+        include 'settings.php';
         break;
+
     case 'logs':
-        if ($_SESSION['role'] === 'admin') include 'logs.php';
+        if ($userRole === 'admin') {
+            include 'logs.php';
+        }
         break;
+
     default:
-        echo "<h1>Página não encontrada</h1>";
+        echo '<div class="text-center"><h1>404</h1><p>Página não encontrada.</p></div>';
         break;
 }
 
-echo '</div></div></main>';
+echo '    </div>';
+echo '  </div>';
+echo '</main>';
+
 include 'includes/footer.php';
 ?>
