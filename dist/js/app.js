@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = '../api/index.php?url=';
+  const API_BASE = '../api/';
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -276,6 +276,54 @@
     });
   }
 
+  async function initSettings() {
+    const settingsForm = document.getElementById('global-settings-form');
+    if (!settingsForm) {
+      return;
+    }
+
+    const loadSettings = async () => {
+      const settings = await window.apiClient.get('settings');
+      settings.forEach((setting) => {
+        const field = settingsForm.querySelector(`[name="${setting.chave}"]`);
+        if (!field) {
+          return;
+        }
+
+        if (field.type === 'checkbox') {
+          field.checked = Number(setting.valor) === 1 || setting.valor === 'true';
+        } else {
+          field.value = setting.valor ?? '';
+        }
+      });
+    };
+
+    settingsForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        nome_sistema: settingsForm.querySelector('[name="nome_sistema"]').value,
+        modo_manutencao: settingsForm.querySelector('[name="modo_manutencao"]').checked ? 1 : 0,
+        logo_url: settingsForm.querySelector('[name="logo_url"]').value,
+        limite_pedidos_loja: Number(settingsForm.querySelector('[name="limite_pedidos_loja"]').value || 0),
+      };
+
+      try {
+        await window.apiClient.put('settings', payload);
+        showFeedback('Configurações globais atualizadas com sucesso.');
+      } catch (error) {
+        showFeedback(error.message, 'error');
+      }
+    });
+
+    try {
+      await loadSettings();
+    } catch (error) {
+      showFeedback(error.message, 'error');
+    }
+
+    await initLojas();
+  }
+
   function initStoreInfo() {
     const token = getToken();
     const payload = token ? parseJwt(token) : null;
@@ -311,7 +359,7 @@
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('user_payload');
       document.cookie = 'jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      window.location.href = 'login.php';
+      window.location.href = 'login';
     });
   }
 
@@ -338,8 +386,12 @@
       await initFornecedores();
     }
 
-    if (document.getElementById('lojas-table-body')) {
+    if (document.getElementById('lojas-table-body') && !document.getElementById('global-settings-form')) {
       await initLojas();
+    }
+
+    if (document.getElementById('global-settings-form')) {
+      await initSettings();
     }
   });
 })();
