@@ -1,4 +1,3 @@
-<?php include_once __DIR__ . '/includes/header.php'; ?>
   <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
@@ -332,4 +331,3 @@
         <!--end::App Content-->
       </main>
 
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
