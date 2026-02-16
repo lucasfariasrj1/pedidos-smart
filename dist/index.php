@@ -13,19 +13,19 @@ echo '<main class="app-main"><div class="app-content-header"><div class="contain
 
 switch ($page) {
     case 'dashboard':
-        include '/dashboard_home.php'; // Crie este ficheiro com o conteúdo da home
+        include 'dashboard_home.php'; // Crie este ficheiro com o conteúdo da home
         break;
     case 'pedidos':
-        include '/pedidos.php';
+        include 'pedidos.php';
         break;
     case 'history-pedidos':
-        include '/historicoPedidos.php';
+        include 'historicoPedidos.php';
         break;
     case 'usuarios':
         if ($_SESSION['role'] === 'admin') include 'usuarios.php';
         break;
     case 'fornecedores':
-        include 'fornecedores.php';
+        include '/fornecedores.php';
         break;
     case 'settings':
         if ($_SESSION['role'] === 'admin') include 'settings.php';

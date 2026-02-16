@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <body class="login-page bg-body-secondary">
     <div class="login-box">
       <div class="login-logo mb-4">
-        <a href="<?= rtrim(BASE_URL, '/') ?>/dist/index.php?page=dashboard" class="text-decoration-none text-dark">
+        <a href="<?= rtrim(BASE_URL, '/') ?>index.php?page=dashboard" class="text-decoration-none text-dark">
           <i class="bi bi-box-seam-fill text-primary"></i> <b>Pedidos</b> SmartHard
         </a>
       </div>
