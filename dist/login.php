@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
     
-    <link rel="stylesheet" href="<?= BASE_URL ?>dist/css/adminlte.css" />
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/adminlte.css" />
   </head>
 
   <body class="login-page bg-body-secondary">
