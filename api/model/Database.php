@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "localhost";
-    private $db_name = "smart_hard_pedidos";
-    private $username = "root";
-    private $password = "";
+    private $host = "151.243.236.234";
+    private $db_name = "pedidos_db";
+    private $username = "pedidos_user";
+    private $password = "A!suptry@123";
     public $conn;
 
     public function getConnection() {
