@@ -1,116 +1,38 @@
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Configurações do Sistema</h3>
-                        </div>
-                    </div>
-                </div>
+<?php
+require_once __DIR__ . '/includes/api/users.php';
+
+$token = $_COOKIE['jwt_token'] ?? '';
+$userMeResponse = usersMeEndpoint($token);
+$userMe = $userMeResponse['ok'] && is_array($userMeResponse['data']) ? $userMeResponse['data'] : [];
+?>
+<div class="app-content-header">
+    <div class="container-fluid">
+        <h3 class="mb-0">Configurações</h3>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Dados do usuário autenticado (GET /auth/users/me)</h3>
             </div>
-
-            <div class="app-content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12 col-lg-8">
-                            <div class="card shadow-sm mb-4">
-                                <div class="card-header">
-                                    <h3 class="card-title fw-bold text-primary">Informações da Empresa</h3>
-                                </div>
-                                <form action="processar_settings.php" method="POST">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">Nome do Sistema/Empresa</label>
-                                                <input type="text" name="app_name" class="form-control" value="Sistema de Pedidos Peças">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">E-mail de Suporte</label>
-                                                <input type="email" name="app_email" class="form-control" value="admin@empresa.com">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold">Mensagem Padrão do WhatsApp</label>
-                                            <textarea name="wa_template" class="form-control" rows="4">Olá! Segue novo pedido realizado via sistema:
-{LISTA_DE_ITENS}
-Aguardamos confirmação.</textarea>
-                                            <small class="text-muted">Use <strong>{LISTA_DE_ITENS}</strong> para onde os produtos devem aparecer.</small>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-white text-end">
-                                        <button type="submit" class="btn btn-primary px-4">Salvar Alterações</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="card shadow-sm">
-                                <div class="card-header border-0">
-                                    <h3 class="card-title fw-bold">Lojas Cadastradas</h3>
-                                    <div class="card-tools">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalNovaLoja">
-                                            <i class="bi bi-house-add me-1"></i> Adicionar Loja
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Nome da Unidade</th>
-                                                <th>Localização</th>
-                                                <th>Status</th>
-                                                <th class="text-end px-4">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td><strong>Loja 1 - São Judas</strong></td>
-                                                <td>Av. Principal, 1000</td>
-                                                <td><span class="badge text-bg-success">Ativa</span></td>
-                                                <td class="text-end px-4">
-                                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td><strong>Loja 2 - Centro</strong></td>
-                                                <td>Rua das Flores, 50</td>
-                                                <td><span class="badge text-bg-success">Ativa</span></td>
-                                                <td class="text-end px-4">
-                                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm bg-primary text-white mb-4">
-                                <div class="card-body">
-                                    <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i> Status do Sistema</h5>
-                                    <p class="mb-1"><strong>PHP:</strong> 8.2.0</p>
-                                    <p class="mb-1"><strong>Banco de Dados:</strong> Conectado</p>
-                                    <p class="mb-1"><strong>Espaço em Disco:</strong> 85% Livre</p>
-                                    <hr class="bg-white opacity-25">
-                                    <p class="mb-0 small italic">Último backup: Hoje, 04:00 AM</p>
-                                </div>
-                            </div>
-
-                            <div class="card shadow-sm border-0">
-                                <div class="card-body text-center py-4">
-                                    <i class="bi bi-shield-check text-success display-4 mb-3 d-block"></i>
-                                    <h5 class="fw-bold">Manutenção</h5>
-                                    <p class="text-muted small">Ative o modo de manutenção para realizar atualizações de banco de dados.</p>
-                                    <button class="btn btn-outline-danger w-100 mt-2">Ativar Modo Manutenção</button>
-                                </div>
-                            </div>
-                        </div>
+            <div class="card-body">
+                <?php if ($userMeResponse['ok']): ?>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label fw-bold">ID</label><input class="form-control" value="<?= (int) ($userMe['id'] ?? 0); ?>" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">E-mail</label><input class="form-control" value="<?= htmlspecialchars((string) ($userMe['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Role</label><input class="form-control" value="<?= htmlspecialchars((string) ($userMe['role'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Loja ID</label><input class="form-control" value="<?= (int) ($userMe['loja_id'] ?? 0); ?>" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Último login</label><input class="form-control" value="<?= htmlspecialchars((string) ($userMe['last_login'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?>" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Atualizado em</label><input class="form-control" value="<?= htmlspecialchars((string) ($userMe['updated_at'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?>" readonly></div>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
-        
+        </div>
+    </div>
+</div>
+
+<?php if (!$userMeResponse['ok']): ?>
+<script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('error', 'Configurações', <?= json_encode((string) ($userMeResponse['data']['error'] ?? 'Falha ao carregar dados do usuário.'), JSON_UNESCAPED_UNICODE); ?>); });</script>
+<?php endif; ?>
