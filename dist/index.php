@@ -1,3 +1,4 @@
+<?php include_once __DIR__ . '/includes/auth_check.php'; ?>
 <?php include_once __DIR__ . '/includes/header.php'; ?>
   <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <!--begin::App Wrapper-->

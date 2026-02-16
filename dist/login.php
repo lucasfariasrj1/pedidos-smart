@@ -5,67 +5,77 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Login | Pedidos SmartHard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#007bff" />
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" />
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="<?= BASE_URL ?>css/adminlte.css" />
   </head>
-
   <body class="login-page bg-body-secondary">
     <div class="login-box">
       <div class="login-logo mb-4">
-        <a href="<?= BASE_URL ?>" class="text-decoration-none text-dark">
-            <i class="bi bi-box-seam-fill text-primary"></i> <b>Pedidos</b> SmartHard
-        </a>
+        <a href="<?= BASE_URL ?>" class="text-decoration-none text-dark"><b>Pedidos</b> SmartHard</a>
       </div>
-      
       <div class="card card-outline card-primary shadow-lg">
         <div class="card-body login-card-body rounded">
-          <p class="login-box-msg fw-bold">Acesse sua conta para gerenciar pedidos</p>
-          
-          <form action="<?= BASE_URL ?>auth/login_process.php" method="post">
-            
+          <p class="login-box-msg fw-bold">Acesse sua conta</p>
+          <form id="login-form">
             <div class="input-group mb-3">
               <input type="email" name="email" class="form-control" placeholder="E-mail" required autofocus />
-              <div class="input-group-text"><span class="bi bi-envelope"></span></div>
             </div>
-            
             <div class="input-group mb-3">
-              <input type="password" name="password" class="form-control" placeholder="Senha" required />
-              <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+              <input type="password" name="senha" class="form-control" placeholder="Senha" required />
             </div>
-
-            <div class="row align-items-center">
-              <div class="col-7">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="remember" id="rememberMe" />
-                  <label class="form-check-label" for="rememberMe"> Lembrar-me </label>
-                </div>
-              </div>
-              <div class="col-5">
-                <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary fw-bold">Entrar <i class="bi bi-box-arrow-in-right ms-1"></i></button>
-                </div>
-              </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary fw-bold">Entrar</button>
             </div>
           </form>
-
-          <div class="mt-4 text-center">
-             <p class="mb-0 small text-secondary">Acesso restrito a colaboradores.</p>
-          </div>
+          <div id="login-message" class="mt-3 small"></div>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-    <script src="<?= BASE_URL ?>js/adminlte.js"></script>
+    <script>
+      const apiLoginUrl = '../api/index.php?url=login';
+
+      function decodeJwt(token) {
+        try {
+          return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        } catch (error) {
+          return null;
+        }
+      }
+
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = document.getElementById('login-message');
+        message.textContent = 'Autenticando...';
+
+        const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+
+        try {
+          const response = await fetch(apiLoginUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+          if (!response.ok || !data.token) {
+            throw new Error(data.error || 'Falha no login');
+          }
+
+          const jwt = data.token;
+          const jwtPayload = decodeJwt(jwt);
+          localStorage.setItem('jwt_token', jwt);
+          localStorage.setItem('user_payload', JSON.stringify(jwtPayload || {}));
+          document.cookie = `jwt_token=${jwt}; path=/; max-age=28800; SameSite=Lax`;
+
+          message.className = 'mt-3 small text-success';
+          message.textContent = 'Login realizado com sucesso. Redirecionando...';
+          window.location.href = 'index.php';
+        } catch (error) {
+          message.className = 'mt-3 small text-danger';
+          message.textContent = error.message;
+        }
+      });
+    </script>
   </body>
 </html>

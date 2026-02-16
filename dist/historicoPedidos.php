@@ -1,3 +1,4 @@
+<?php include_once __DIR__ . '/includes/auth_check.php'; ?>
 <?php include_once __DIR__ . '/includes/header.php'; ?>
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <div class="app-wrapper">
@@ -13,7 +14,7 @@
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>
-                            <span class="d-none d-md-inline">Marcos Paulo</span>
+                            <span class="d-none d-md-inline" data-user-name>Usuário</span>
                         </a>
                     </li>
                 </ul>
@@ -28,7 +29,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <h3 class="mb-0">Histórico de Pedidos</h3>
-                            <p class="text-secondary small">Visualizando pedidos da: <strong>LOJA 1 - SÃO JUDAS</strong></p>
+                            <p class="text-secondary small">Visualizando pedidos da: <strong data-store-name>-</strong></p>
                         </div>
                     </div>
                 </div>
@@ -55,38 +56,7 @@
                                                 <th class="text-center">Ações</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><span class="text-secondary">#1052</span></td>
-                                                <td>15/02/2026</td>
-                                                <td>
-                                                    <span class="fw-bold">iPhone 14 Pro Max</span><br>
-                                                    <small class="text-muted">Tela OLED Incell</small>
-                                                </td>
-                                                <td>1</td>
-                                                <td>Leo Peças</td>
-                                                <td>R$ 450,00</td>
-                                                <td class="text-center">
-                                                    <div class="btn-group">
-                                                        <button class="btn btn-outline-primary btn-sm" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#modalDetalhes1052" 
-                                                                title="Ver Detalhes">
-                                                            <i class="bi bi-search"></i>
-                                                        </button>
-                                                        
-                                                        <?php 
-                                                            $zap_fornecedor = "5511999999999"; 
-                                                            $msg = urlencode("*Novo Pedido de Compra*\n\n*Pedido:* #1052\n*Loja:* São Judas\n*Item:* Tela OLED iPhone 14 Pro Max\n*Qtd:* 1\n*Preço:* R$ 450,00");
-                                                        ?>
-                                                        <a href="https://api.whatsapp.com/send?phone=<?= $zap_fornecedor ?>&text=<?= $msg ?>" 
-                                                           target="_blank" class="btn btn-success btn-sm">
-                                                            <i class="bi bi-whatsapp"></i> WhatsApp
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
+                                        <tbody id="pedidos-table-body"></tbody>
                                     </table>
                                 </div>
                             </div>

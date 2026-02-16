@@ -15,6 +15,12 @@ class FornecedorController
 
     public function handle(string $metodo, ?int $id, array $user): void
     {
+        if (($user['role'] ?? 'usuario') !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acesso negado']);
+            return;
+        }
+
         switch ($metodo) {
             case 'GET':
                 echo json_encode($this->model->all());
