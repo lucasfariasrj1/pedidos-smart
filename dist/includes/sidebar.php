@@ -64,7 +64,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="/configuracoes.php" class="nav-link {{ request()->is('admin/configuracoes*') ? 'active' : '' }}">
+              <a href="/settings.php" class="nav-link {{ request()->is('admin/configuracoes*') ? 'active' : '' }}">
                 <i class="nav-icon bi bi-gear"></i>
                 <p>Configurações</p>
               </a>
