@@ -10,6 +10,8 @@
         Todos os Direitos Reservados.
         <br />
         <p>
+          <strong>Version</strong>  1.0.0
+        <p>
         Desenvolvido por <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
         </p>
         <!--end::Copyright-->
