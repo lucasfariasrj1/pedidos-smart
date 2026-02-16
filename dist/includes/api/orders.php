@@ -1,29 +1,26 @@
 <?php
 
-require_once __DIR__ . '/client.php';
+require_once __DIR__ . '/endpoint_auth_orders_get.php';
+require_once __DIR__ . '/endpoint_auth_orders_post.php';
+require_once __DIR__ . '/endpoint_auth_orders_put.php';
+require_once __DIR__ . '/endpoint_auth_orders_delete.php';
 
 function ordersListEndpoint(string $token): array
 {
-    return apiRequest('GET', '/orders', null, $token);
+    return endpointAuthOrdersGet($token);
 }
 
 function ordersCreateEndpoint(string $token, string $peca, int $fornecedorId, string $observacao): array
 {
-    return apiRequest('POST', '/orders', [
-        'peca' => $peca,
-        'fornecedor_id' => $fornecedorId,
-        'observacao' => $observacao,
-    ], $token);
+    return endpointAuthOrdersPost($token, $peca, $fornecedorId, $observacao);
 }
 
 function ordersUpdateEndpoint(string $token, int $id, string $status): array
 {
-    return apiRequest('PUT', '/orders/' . $id, [
-        'status' => $status,
-    ], $token);
+    return endpointAuthOrdersPut($token, $id, $status);
 }
 
 function ordersDeleteEndpoint(string $token, int $id): array
 {
-    return apiRequest('DELETE', '/orders/' . $id, null, $token);
+    return endpointAuthOrdersDelete($token, $id);
 }

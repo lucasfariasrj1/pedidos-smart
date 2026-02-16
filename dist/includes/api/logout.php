@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '/client.php';
+require_once __DIR__ . '/endpoint_auth_logout.php';
 
 function logoutEndpoint(string $token): array
 {
-    return apiRequest('POST', '/logout', [], $token);
+    return endpointAuthLogout($token);
 }

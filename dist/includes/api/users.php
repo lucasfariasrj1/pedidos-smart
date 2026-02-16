@@ -1,13 +1,14 @@
 <?php
 
-require_once __DIR__ . '/client.php';
+require_once __DIR__ . '/endpoint_auth_users_me.php';
+require_once __DIR__ . '/endpoint_auth_users_listall.php';
 
 function usersListAllEndpoint(string $token): array
 {
-    return apiRequest('GET', '/users/listall', null, $token);
+    return endpointAuthUsersListAll($token);
 }
 
 function usersMeEndpoint(string $token): array
 {
-    return apiRequest('GET', '/users/me', null, $token);
+    return endpointAuthUsersMe($token);
 }

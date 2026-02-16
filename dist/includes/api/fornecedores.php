@@ -1,31 +1,26 @@
 <?php
 
-require_once __DIR__ . '/client.php';
+require_once __DIR__ . '/endpoint_auth_fornecedores_get.php';
+require_once __DIR__ . '/endpoint_auth_fornecedores_post.php';
+require_once __DIR__ . '/endpoint_auth_fornecedores_put.php';
+require_once __DIR__ . '/endpoint_auth_fornecedores_delete.php';
 
 function fornecedoresListEndpoint(string $token): array
 {
-    return apiRequest('GET', '/fornecedores', null, $token);
+    return endpointAuthFornecedoresGet($token);
 }
 
 function fornecedoresCreateEndpoint(string $token, string $nome, string $whatsapp, string $email): array
 {
-    return apiRequest('POST', '/fornecedores', [
-        'nome' => $nome,
-        'whatsapp' => $whatsapp,
-        'email' => $email,
-    ], $token);
+    return endpointAuthFornecedoresPost($token, $nome, $whatsapp, $email);
 }
 
 function fornecedoresUpdateEndpoint(string $token, int $id, string $nome, string $whatsapp, string $email): array
 {
-    return apiRequest('PUT', '/fornecedores/' . $id, [
-        'nome' => $nome,
-        'whatsapp' => $whatsapp,
-        'email' => $email,
-    ], $token);
+    return endpointAuthFornecedoresPut($token, $id, $nome, $whatsapp, $email);
 }
 
 function fornecedoresDeleteEndpoint(string $token, int $id): array
 {
-    return apiRequest('DELETE', '/fornecedores/' . $id, null, $token);
+    return endpointAuthFornecedoresDelete($token, $id);
 }
