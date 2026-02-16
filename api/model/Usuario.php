@@ -32,7 +32,7 @@ class Usuario
 
     public function findByEmail(string $email): ?array
     {
-        $query = "SELECT * FROM {$this->table_name} WHERE email = ? LIMIT 1";
+        $query = "SELECT u.*, l.nome AS loja_nome FROM {$this->table_name} u LEFT JOIN lojas l ON u.loja_id = l.id WHERE u.email = ? LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);

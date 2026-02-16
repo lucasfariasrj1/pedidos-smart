@@ -65,7 +65,10 @@ class AuthController
 
         $token = $this->authMiddleware->generateToken([
             'id' => (int)$usuario['id'],
+            'nome' => $usuario['nome'] ?? '',
+            'email' => $usuario['email'] ?? '',
             'loja_id' => isset($usuario['loja_id']) ? (int)$usuario['loja_id'] : null,
+            'loja_nome' => $usuario['loja_nome'] ?? null,
             'role' => $usuario['role'] ?? 'usuario'
         ]);
 

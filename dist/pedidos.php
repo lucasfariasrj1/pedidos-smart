@@ -1,3 +1,4 @@
+<?php include_once __DIR__ . '/includes/auth_check.php'; ?>
 <?php include_once __DIR__ . '/includes/header.php'; ?>
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <div class="app-wrapper">
@@ -12,7 +13,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
+                            <span class="d-none d-md-inline" data-user-name>Usuário</span>
                         </a>
                     </li>
                 </ul>
@@ -25,7 +26,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <h3 class="mb-0">Nova Peça</h3>
-                            <p class="text-secondary small">LOJA NÃO VINCULADA</p>
+                            <p class="text-secondary small">Loja vinculada: <strong data-store-name>-</strong></p>
                         </div>
                     </div>
                 </div>
@@ -36,7 +37,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-8 col-lg-6">
                             <div class="card card-primary card-outline shadow-sm">
-                                <form action="{{ route('pedidos.store') }}" method="POST">
+                                <form id="pedido-form" method="POST">
                                     <div class="card-body">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Modelo do Celular</label>
@@ -58,7 +59,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Data do Pedido</label>
-                                                <input type="date" name="data_pedido" class="form-control" value="{{ date('Y-m-d') }}" required>
+                                                <input type="date" name="data_pedido" class="form-control" value="<?= date('Y-m-d') ?>" required>
                                             </div>
                                         </div>
 
