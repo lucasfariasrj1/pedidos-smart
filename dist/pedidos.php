@@ -97,6 +97,32 @@ if (!$fornecedoresResponse['ok'] && $feedbackMessage === null) {
                                 <label class="form-label fw-bold">Observações</label>
                                 <textarea name="observacoes" class="form-control" rows="3" placeholder="Cor, especificação, etc..."></textarea>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Fornecedor</label>
+                                <select id="fornecedorSelect" name="fornecedor_id" class="form-select" required>
+                                    <option value="">Selecione...</option>
+                                    <?php foreach ($fornecedores as $fornecedor): ?>
+                                        <option value="<?= (int) ($fornecedor['id'] ?? 0); ?>"><?= htmlspecialchars((string) ($fornecedor['nome'] ?? 'Sem nome'), ENT_QUOTES, 'UTF-8'); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Observações</label>
+                                <textarea name="observacoes" class="form-control" rows="3" placeholder="Cor, especificação, etc..."></textarea>
+                            </div>
+
+                           
+                        </div>
+
+                        <div class="card-footer d-grid gap-2">
+                            <button id="btnSubmitPedido" type="submit" class="btn btn-primary py-2 fw-bold">
+                                <i class="bi bi-plus-lg me-2"></i> Adicionar Peça
+                            </button>
+                        </div>
+                        <div class="card-footer d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-2 fw-bold"><i class="bi bi-plus-lg me-2"></i> Criar Pedido</button>
                         </div>
                         <div class="card-footer d-grid gap-2">
                             <button type="submit" class="btn btn-primary py-2 fw-bold"><i class="bi bi-plus-lg me-2"></i> Criar Pedido</button>
