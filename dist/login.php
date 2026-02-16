@@ -56,46 +56,94 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="<?= BASE_URL ?>dist/js/adminlte.js"></script>
-    <script>
-      // Faz login usando o proxy local /api/auth/login.php
-      document.getElementById('login-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const message = document.getElementById('login-message');
-        message.className = 'mt-3 text-center small text-secondary';
-        message.textContent = 'Autenticando...';
+<script>
+  const BASE_URL = "<?= rtrim(BASE_URL, '/'); ?>";
 
-        const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+  function isHttps() {
+    return window.location.protocol === "https:";
+  }
 
-        try {
-          const res = await fetch('/api/auth/login.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            credentials: 'same-origin'
-          });
+  async function safeReadResponse(res) {
+    const text = await res.text();
+    try {
+      return { ok: res.ok, data: JSON.parse(text), raw: text };
+    } catch {
+      return { ok: res.ok, data: null, raw: text };
+    }
+  }
 
-          const data = await res.json();
-          if (!res.ok || !data.token) {
-            message.className = 'mt-3 text-center small text-danger';
-            message.textContent = data.error || data.message || 'Falha na autenticação.';
-            return;
-          }
+  document.getElementById('login-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-          // Armazena cookie para que o PHP do painel aceite a sessão
-          // Tempo de vida: 8 horas
-          document.cookie = `jwt_token=${data.token}; path=/; max-age=28800; SameSite=Lax`;
-          // Guarde também em localStorage para chamadas AJAX do front-end
-          localStorage.setItem('jwt_token', data.token);
+    const form = event.currentTarget;
+    const btn = form.querySelector('button[type="submit"]');
+    const message = document.getElementById('login-message');
 
-          message.className = 'mt-3 text-center small text-success';
-          message.textContent = 'Login realizado! Redirecionando...';
-          setTimeout(() => window.location.href = 'index.php?page=dashboard', 700);
+    message.className = 'mt-3 text-center small text-secondary';
+    message.textContent = 'Autenticando...';
+    btn.disabled = true;
 
-        } catch (err) {
-          message.className = 'mt-3 text-center small text-danger';
-          message.textContent = 'Erro ao conectar com o servidor.';
-        }
+    const payload = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      // Use BASE_URL para evitar path errado quando estiver em /dist/ ou subpasta
+      const url = `${BASE_URL}/api/auth/login.php`;
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        credentials: 'same-origin'
       });
-    </script>
+
+      const parsed = await safeReadResponse(res);
+
+      // Se não veio JSON, mostra algo útil
+      if (!parsed.data) {
+        message.className = 'mt-3 text-center small text-danger';
+        message.textContent = parsed.ok
+          ? 'Resposta inesperada do servidor (não é JSON).'
+          : `Erro no login: ${parsed.raw?.slice(0, 120) || 'Resposta inválida'}`;
+        btn.disabled = false;
+        return;
+      }
+
+      const data = parsed.data;
+
+      // Ajuste aqui se sua API retornar { token: "..."} ou { data: { token: "..." } }
+      const token = data.token || data?.data?.token;
+
+      if (!res.ok || !token) {
+        message.className = 'mt-3 text-center small text-danger';
+        message.textContent = data.message || data.error || 'Falha na autenticação.';
+        btn.disabled = false;
+        return;
+      }
+
+      // Cookie (8 horas). Secure só em HTTPS.
+      const secure = isHttps() ? '; Secure' : '';
+      document.cookie = `jwt_token=${encodeURIComponent(token)}; Path=/; Max-Age=28800; SameSite=Lax${secure}`;
+
+      // Opcional: também guardar no localStorage
+      localStorage.setItem('jwt_token', token);
+
+      message.className = 'mt-3 text-center small text-success';
+      message.textContent = 'Login realizado! Redirecionando...';
+
+      setTimeout(() => {
+        window.location.href = `${BASE_URL}/dist/index.php?page=dashboard`;
+      }, 700);
+
+    } catch (err) {
+      message.className = 'mt-3 text-center small text-danger';
+      message.textContent = 'Erro ao conectar com o servidor.';
+      btn.disabled = false;
+    }
+  });
+</script>
+
   </body>
 </html>
