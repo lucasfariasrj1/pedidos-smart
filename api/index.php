@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/model/Database.php';
+require_once __DIR__ . '/model/Setting.php';
 require_once __DIR__ . '/controllers/LogController.php';
 require_once __DIR__ . '/middleware/AuthMiddleware.php';
 require_once __DIR__ . '/controllers/AuthController.php';
@@ -17,13 +18,21 @@ require_once __DIR__ . '/controllers/PedidoController.php';
 require_once __DIR__ . '/controllers/FornecedorController.php';
 require_once __DIR__ . '/controllers/UsuarioController.php';
 require_once __DIR__ . '/controllers/LojaController.php';
+require_once __DIR__ . '/controllers/SettingController.php';
 
 $url = isset($_GET['url']) ? explode('/', trim($_GET['url'], '/')) : [];
 $recurso = $url[0] ?? null;
 $id = isset($url[1]) ? (int)$url[1] : null;
+$subrecurso = $url[1] ?? null;
 $metodo = $_SERVER['REQUEST_METHOD'];
 
 $db = (new Database())->getConnection();
+if (!($db instanceof PDO)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Erro de conexão com banco de dados']);
+    exit;
+}
+$settingModel = new Setting($db);
 $logController = new LogController($db);
 $authMiddleware = new AuthMiddleware('smart-hard-super-secret');
 
@@ -47,6 +56,14 @@ if (!isset($publicRoutes[$recurso]) || !in_array($metodo, $publicRoutes[$recurso
         echo json_encode(['error' => 'Não autorizado: ' . $e->getMessage()]);
         exit;
     }
+}
+
+$maintenance = $settingModel->getByKey('modo_manutencao');
+$isMaintenance = isset($maintenance['valor']) && ((string)$maintenance['valor'] === '1' || strtolower((string)$maintenance['valor']) === 'true');
+if ($isMaintenance && (($user_session['role'] ?? 'usuario') !== 'admin')) {
+    http_response_code(503);
+    echo json_encode(['error' => 'Sistema em manutenção']);
+    exit;
 }
 
 switch ($recurso) {
@@ -80,7 +97,15 @@ switch ($recurso) {
         break;
 
     case 'lojas':
+        if ($metodo === 'POST') {
+            (new SettingController($db, $logController))->handle($metodo, 'lojas', $user_session);
+            break;
+        }
         (new LojaController($db, $logController))->handle($metodo, $id, $user_session);
+        break;
+
+    case 'settings':
+        (new SettingController($db, $logController))->handle($metodo, $subrecurso, $user_session);
         break;
 
     case 'logs':

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config.php';
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -43,6 +44,10 @@ $_SESSION['jwt_token'] = $token;
 $_SESSION['user_payload'] = $payload;
 
 $role = $payload['role'] ?? 'usuario';
+if (isMaintenanceMode() && $role !== 'admin') {
+    header('Location: manutencao.php');
+    exit;
+}
 $currentPage = basename($_SERVER['PHP_SELF']);
 $adminOnlyPages = ['usuarios.php', 'fornecedores.php', 'settings.php', 'logs.php'];
 $userAllowedPages = ['pedidos.php', 'historicoPedidos.php', 'index.php'];

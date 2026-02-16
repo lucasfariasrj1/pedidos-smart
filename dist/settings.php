@@ -6,6 +6,37 @@
     <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
     <main class="app-main p-3">
       <div class="container-fluid">
+        <h3>Configurações Globais</h3>
+
+        <div class="card mb-3">
+          <div class="card-header">Parâmetros do Sistema</div>
+          <div class="card-body">
+            <form id="global-settings-form" class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nome do Sistema</label>
+                <input type="text" class="form-control" name="nome_sistema" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">URL da Logo</label>
+                <input type="text" class="form-control" name="logo_url">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Limite de Pedidos por Loja</label>
+                <input type="number" class="form-control" name="limite_pedidos_loja" min="0" step="1">
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="modo_manutencao" id="modo_manutencao">
+                  <label class="form-check-label" for="modo_manutencao">Modo manutenção ativo</label>
+                </div>
+              </div>
+              <div class="col-md-4 d-grid align-items-end">
+                <button class="btn btn-primary" type="submit">Salvar Configurações</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <h3>Lojas</h3>
         <div class="card mb-3">
           <div class="card-body">
