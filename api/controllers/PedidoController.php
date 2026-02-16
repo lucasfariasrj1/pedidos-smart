@@ -10,9 +10,8 @@ class PedidoController {
 
         switch ($metodo) {
             case 'GET':
-                // Se não for admin, filtra pela loja do usuário
                 $loja_id = ($user['role'] === 'admin') ? null : $user['loja_id'];
-                $result = $id ? $model->find($id, $loja_id) : $model->all($loja_id);
+                $result = $id ? $model->find($id, $loja_id) : $model->read($loja_id);
                 echo json_encode($result);
                 break;
 
@@ -20,15 +19,23 @@ class PedidoController {
                 $data = json_decode(file_get_contents("php://input"), true);
                 $data['loja_id'] = $user['loja_id'];
                 $data['usuario_id'] = $user['id'];
-                
                 if ($model->create($data)) {
-                    $log->registrar($user['id'], "CRIAR", "Pedido de {$data['nome_peca']} adicionado.");
+                    $log->registrar($user['id'], "CRIAR", "Pedido de {$data['peca']} adicionado.");
                     echo json_encode(["message" => "Pedido criado!"]);
                 }
                 break;
 
+            case 'PUT':
+                $data = json_decode(file_get_contents("php://input"), true);
+                if ($model->update($id, $data)) {
+                    $log->registrar($user['id'], "EDITAR", "Status do pedido #$id alterado.");
+                    echo json_encode(["message" => "Pedido atualizado!"]);
+                }
+                break;
+
             case 'DELETE':
-                if ($model->delete($id, $user['loja_id'])) {
+                $loja_id = ($user['role'] === 'admin') ? null : $user['loja_id'];
+                if ($model->delete($id, $loja_id)) {
                     $log->registrar($user['id'], "EXCLUIR", "Pedido ID $id removido.");
                     echo json_encode(["message" => "Pedido excluído!"]);
                 }

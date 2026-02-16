@@ -14,6 +14,11 @@ class Fornecedor {
         return $this->conn->prepare($query)->execute([$data['nome'], $data['whatsapp'], $data['email']]);
     }
 
+    public function update($id, $data) {
+        $query = "UPDATE " . $this->table_name . " SET nome=?, whatsapp=?, email=? WHERE id=?";
+        return $this->conn->prepare($query)->execute([$data['nome'], $data['whatsapp'], $data['email'], $id]);
+    }
+
     public function delete($id) {
         return $this->conn->prepare("DELETE FROM " . $this->table_name . " WHERE id = ?")->execute([$id]);
     }
