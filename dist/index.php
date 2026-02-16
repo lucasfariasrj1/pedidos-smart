@@ -52,6 +52,11 @@ switch ($url) {
         $pageFile = '401.php';
         break;
 
+    case '403':
+        $pageTitle = '403 | SmartHard';
+        $pageFile = '403.php';
+        break;
+
     case '500':
         $pageTitle = '500 | SmartHard';
         $pageFile = '500.php';

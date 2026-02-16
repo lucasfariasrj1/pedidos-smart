@@ -68,7 +68,7 @@ if (!$token) {
 }
 
 $payload = decodeJwtPayload($token);
-$exp = isset($payload['exp']) ? (int)$payload['exp'] : 0;
+$exp = isset($payload['exp']) ? (int) $payload['exp'] : 0;
 
 if (!$payload || ($exp > 0 && $exp <= time())) {
     clearAuthData();
@@ -82,7 +82,8 @@ $_SESSION['jwt_payload'] = $payload;
 $_SESSION['user_id'] = $payload['sub'] ?? ($_SESSION['user_id'] ?? null);
 $_SESSION['email'] = $payload['email'] ?? ($_SESSION['email'] ?? null);
 $_SESSION['name'] = $payload['name'] ?? ($_SESSION['name'] ?? 'Usuário');
-$_SESSION['role'] = strtolower((string)($payload['role'] ?? ($_SESSION['role'] ?? 'user')));
+$_SESSION['role'] = strtolower((string) ($payload['role'] ?? ($_SESSION['role'] ?? 'user')));
+$_SESSION['loja_id'] = isset($payload['loja_id']) ? (int) $payload['loja_id'] : ($_SESSION['loja_id'] ?? null);
 $_SESSION['token_exp'] = $exp;
 
 if ($isLoginPage) {
@@ -90,4 +91,3 @@ if ($isLoginPage) {
     header('Location: ' . $dashboardUrl);
     exit;
 }
-?>

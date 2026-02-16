@@ -1,18 +1,23 @@
 <?php
 require_once __DIR__ . '/includes/api/users.php';
-require_once __DIR__ . '/includes/api/auth.php';
 
-$token = $_COOKIE['jwt_token'] ?? '';
+$token = (string) ($_COOKIE['jwt_token'] ?? '');
+$userRole = strtolower((string) ($_SESSION['role'] ?? 'user'));
 $message = null;
 $error = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $userRole !== 'admin') {
+    include __DIR__ . '/403.php';
+    return;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create_user') {
     $email = trim((string) ($_POST['email'] ?? ''));
     $senha = trim((string) ($_POST['senha'] ?? ''));
-    $role = trim((string) ($_POST['role'] ?? 'user'));
-    $lojaId = (int) ($_POST['loja_id'] ?? 1);
+    $role = strtolower(trim((string) ($_POST['role'] ?? 'user')));
+    $lojaId = (int) ($_POST['loja_id'] ?? 0);
 
-    $response = registerEndpoint($email, $senha, $role, $lojaId);
+    $response = usersCreateEndpoint($token, $email, $senha, $role, $lojaId);
     if ($response['ok']) {
         $message = $response['data']['message'] ?? 'Usuário registrado!';
     } else {
@@ -43,7 +48,7 @@ $users = $usersResponse['ok'] && is_array($usersResponse['data']) ? $usersRespon
                             <option value="admin">admin</option>
                         </select>
                     </div>
-                    <div class="col-md-2"><input type="number" name="loja_id" class="form-control" value="1" min="1" required></div>
+                    <div class="col-md-2"><input type="number" name="loja_id" class="form-control" placeholder="Loja ID" min="1" required></div>
                     <div class="col-md-1"><button type="submit" class="btn btn-primary w-100">+</button></div>
                 </form>
             </div>

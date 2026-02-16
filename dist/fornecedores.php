@@ -1,9 +1,15 @@
 <?php
 require_once __DIR__ . '/includes/api/fornecedores.php';
 
-$token = $_COOKIE['jwt_token'] ?? '';
+$token = (string) ($_COOKIE['jwt_token'] ?? '');
+$userRole = strtolower((string) ($_SESSION['role'] ?? 'user'));
 $message = null;
 $error = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $userRole !== 'admin') {
+    include __DIR__ . '/403.php';
+    return;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -58,17 +64,11 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
 
 <div class="app-content">
     <div class="container-fluid">
-        <div class="card mb-3">
-            <div class="card-body">
-                <form method="POST" class="row g-2">
-                    <input type="hidden" name="action" value="create">
-                    <div class="col-md-4"><input class="form-control" name="nome" placeholder="Nome" required></div>
-                    <div class="col-md-3"><input class="form-control" name="whatsapp" placeholder="WhatsApp" required></div>
-                    <div class="col-md-3"><input class="form-control" name="email" type="email" placeholder="E-mail" required></div>
-                    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Novo</button></div>
-                </form>
-            </div>
+        <?php if ($userRole === 'admin'): ?>
+        <div class="mb-3 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fornecedorCreateModal">Novo fornecedor</button>
         </div>
+        <?php endif; ?>
 
         <div class="card shadow-sm">
             <div class="table-responsive">
@@ -84,22 +84,25 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
                             <td><?= htmlspecialchars((string) ($fornecedor['whatsapp'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                             <td><?= htmlspecialchars((string) ($fornecedor['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                             <td>
-                                <details>
-                                    <summary class="btn btn-sm btn-outline-secondary">Editar</summary>
-                                    <form method="POST" class="mt-2 d-flex gap-2 flex-wrap">
-                                        <input type="hidden" name="action" value="update">
-                                        <input type="hidden" name="id" value="<?= (int) ($fornecedor['id'] ?? 0); ?>">
-                                        <input class="form-control form-control-sm" name="nome" value="<?= htmlspecialchars((string) ($fornecedor['nome'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required>
-                                        <input class="form-control form-control-sm" name="whatsapp" value="<?= htmlspecialchars((string) ($fornecedor['whatsapp'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required>
-                                        <input class="form-control form-control-sm" name="email" type="email" value="<?= htmlspecialchars((string) ($fornecedor['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required>
-                                        <button class="btn btn-sm btn-outline-primary" type="submit">Salvar</button>
-                                    </form>
-                                </details>
-                                <form method="POST" class="mt-1 js-confirm-form" data-confirm-title="Remover fornecedor" data-confirm-message="Tem certeza que deseja remover este fornecedor?">
+                                <?php if ($userRole === 'admin'): ?>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#fornecedorEditModal"
+                                    data-id="<?= (int) ($fornecedor['id'] ?? 0); ?>"
+                                    data-nome="<?= htmlspecialchars((string) ($fornecedor['nome'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                    data-whatsapp="<?= htmlspecialchars((string) ($fornecedor['whatsapp'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                    data-email="<?= htmlspecialchars((string) ($fornecedor['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                >Editar</button>
+                                <form method="POST" class="d-inline js-confirm-form" data-confirm-title="Remover fornecedor" data-confirm-message="Tem certeza que deseja remover este fornecedor?">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= (int) ($fornecedor['id'] ?? 0); ?>">
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
                                 </form>
+                                <?php else: ?>
+                                    <span class="badge text-bg-secondary">Visualização</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; endif; ?>
@@ -109,6 +112,64 @@ $fornecedores = $listResponse['ok'] && is_array($listResponse['data']) ? $listRe
         </div>
     </div>
 </div>
+
+<?php if ($userRole === 'admin'): ?>
+<div class="modal fade" id="fornecedorCreateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Novo Fornecedor</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="action" value="create">
+          <div class="mb-2"><input class="form-control" name="nome" placeholder="Nome" required></div>
+          <div class="mb-2"><input class="form-control" name="whatsapp" placeholder="WhatsApp" required></div>
+          <div class="mb-2"><input class="form-control" name="email" type="email" placeholder="E-mail" required></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" type="submit">Salvar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="fornecedorEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Editar fornecedor</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="action" value="update">
+          <input type="hidden" name="id" id="editFornecedorId">
+          <div class="mb-2"><input class="form-control" name="nome" id="editFornecedorNome" required></div>
+          <div class="mb-2"><input class="form-control" name="whatsapp" id="editFornecedorWhatsapp" required></div>
+          <div class="mb-2"><input class="form-control" name="email" id="editFornecedorEmail" type="email" required></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" type="submit">Atualizar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('fornecedorEditModal');
+    if (!modal) {
+        return;
+    }
+
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        if (!button) {
+            return;
+        }
+
+        document.getElementById('editFornecedorId').value = button.getAttribute('data-id') || '';
+        document.getElementById('editFornecedorNome').value = button.getAttribute('data-nome') || '';
+        document.getElementById('editFornecedorWhatsapp').value = button.getAttribute('data-whatsapp') || '';
+        document.getElementById('editFornecedorEmail').value = button.getAttribute('data-email') || '';
+    });
+});
+</script>
+<?php endif; ?>
 
 <?php if ($message): ?>
 <script>document.addEventListener('DOMContentLoaded', function () { showSystemAlert('success', 'Fornecedores', <?= json_encode($message, JSON_UNESCAPED_UNICODE); ?>); });</script>
