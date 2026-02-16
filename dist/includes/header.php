@@ -1,4 +1,7 @@
 <?php
+include_once __DIR__ . '/auth_check.php';
+
+
 $baseUrl = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
 $currentTitle = $pageTitle ?? 'Pedidos SmartHard';
 ?>
