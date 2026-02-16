@@ -50,36 +50,8 @@
                                             <th class="text-center">Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">MP</div>
-                                                    <span class="fw-bold">Marcos Paulo</span>
-                                                </div>
-                                            </td>
-                                            <td>marcos@admin.com</td>
-                                            <td><span class="text-muted italic">Acesso Global</span></td>
-                                            <td><span class="badge rounded-pill text-bg-danger">Administrador</span></td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-light border" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">JS</div>
-                                                    <span class="fw-bold">João Silva</span>
-                                                </div>
-                                            </td>
-                                            <td>joao@loja1.com</td>
-                                            <td><span class="badge text-bg-info">LOJA 1 - SÃO JUDAS</span></td>
-                                            <td><span class="badge rounded-pill text-bg-secondary">Usuário Loja</span></td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-light border"><i class="bi bi-pencil-square"></i></button>
-                                                <button class="btn btn-sm btn-light border text-danger"><i class="bi bi-trash"></i></button>
-                                            </td>
-                                        </tr>
+                                    <tbody id="usuariosTbody">
+                                        <tr><td colspan="5" class="text-center small text-muted">Carregando usuários...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -92,7 +64,7 @@
         <div class="modal fade" id="modalNovoUsuario" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content shadow-lg border-0">
-                    <form action="processar_usuario.php" method="POST">
+                    <form id="formNovoUsuario" action="#" method="POST">
                         <div class="modal-header bg-dark text-white">
                             <h5 class="modal-title">Novo Usuário do Sistema</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -129,9 +101,9 @@
                                 <small class="text-muted italic">O usuário verá apenas pedidos desta loja.</small>
                             </div>
                         </div>
-                        <div class="modal-footer bg-light">
+                            <div class="modal-footer bg-light">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="submit" class="btn btn-primary">Criar Usuário</button>
+                            <button id="btnCriarUsuario" type="submit" class="btn btn-primary">Criar Usuário</button>
                         </div>
                     </form>
                 </div>
@@ -139,16 +111,55 @@
         </div>
 
         <script>
-            // Lógica para esconder o select de loja se for Admin
+            const apiUsers = {
+                list: async () => fetch('/api/auth/users/listall.php', { credentials: 'same-origin' }).then(r=>r.json()),
+                register: async (data) => fetch('/api/auth/register.php', { method: 'POST', credentials: 'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)})
+            };
+
+            async function loadUsers(){
+                const tbody = document.getElementById('usuariosTbody');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center small text-muted">Carregando...</td></tr>';
+                try{
+                    const data = await apiUsers.list();
+                    if (!Array.isArray(data)) { tbody.innerHTML = '<tr><td colspan="5">Erro ao listar usuários</td></tr>'; return; }
+                    tbody.innerHTML = data.map(u=>`
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">${(u.email||'U').slice(0,2).toUpperCase()}</div>
+                                    <span class="fw-bold">${u.email||''}</span>
+                                </div>
+                            </td>
+                            <td>${u.email||''}</td>
+                            <td>${u.loja_id? ('Loja ' + u.loja_id): '<span class="text-muted italic">Acesso Global</span>'}</td>
+                            <td>${u.role === 'admin' ? '<span class="badge rounded-pill text-bg-danger">Administrador</span>' : '<span class="badge rounded-pill text-bg-secondary">Usuário Loja</span>'}</td>
+                            <td class="text-center"><button class="btn btn-sm btn-light border" title="Editar"><i class="bi bi-pencil-square"></i></button></td>
+                        </tr>
+                    `).join('');
+                }catch(e){ tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar usuários</td></tr>'; }
+            }
+
+            // Criação de usuário via API
+            document.getElementById('formNovoUsuario').addEventListener('submit', async (e)=>{
+                e.preventDefault();
+                const btn = document.getElementById('btnCriarUsuario');
+                btn.disabled = true;
+                const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+                try{
+                    const res = await apiUsers.register(data);
+                    if (res.ok) { alert('Usuário criado'); document.querySelector('#modalNovoUsuario .btn-close')?.click(); loadUsers(); }
+                    else { const err = await res.json().catch(()=>null); alert('Erro: '+(err?.error||err?.message||'Falha')); }
+                }catch(e){ alert('Erro ao conectar'); }
+                btn.disabled = false;
+            });
+
             function toggleLojaSelect() {
                 const role = document.getElementById('roleSelect').value;
                 const container = document.getElementById('lojaContainer');
-                if (role === 'admin') {
-                    container.style.display = 'none';
-                } else {
-                    container.style.display = 'block';
-                }
+                if (role === 'admin') container.style.display = 'none'; else container.style.display = 'block';
             }
+
+            loadUsers();
         </script>
 
 <?php include_once __DIR__ . '/includes/footer.php'; ?>

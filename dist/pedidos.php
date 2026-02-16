@@ -36,7 +36,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-8 col-lg-6">
                             <div class="card card-primary card-outline shadow-sm">
-                                <form action="{{ route('pedidos.store') }}" method="POST">
+                                <form id="pedido-form" action="#" method="POST">
                                     <div class="card-body">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Modelo do Celular</label>
@@ -64,9 +64,8 @@
 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Fornecedor</label>
-                                            <select name="fornecedor_id" class="form-select" required>
-                                                <option value="">Selecione um fornecedor</option>
-                                                    <option value="{{ $fornecedor->id }}">{{ $fornecedor->nome }}</option>
+                                            <select id="fornecedorSelect" name="fornecedor_id" class="form-select" required>
+                                                <option value="">Carregando fornecedores...</option>
                                             </select>
                                         </div>
 
@@ -81,8 +80,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="card-footer d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary py-2 fw-bold">
+                                        <div class="card-footer d-grid gap-2">
+                                        <button id="btnSubmitPedido" type="submit" class="btn btn-primary py-2 fw-bold">
                                             <i class="bi bi-plus-lg me-2"></i> Adicionar Peça
                                         </button>
                                     </div>
@@ -94,3 +93,42 @@
             </div>
         </main>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
+
+<script>
+// Preenche select de fornecedores e submete o formulário via /api
+async function loadFornecedores(){
+    const sel = document.getElementById('fornecedorSelect');
+    sel.innerHTML = '<option value="">Carregando...</option>';
+    try{
+        const res = await fetch('/api/fornecedores/index.php', { credentials: 'same-origin' });
+        const data = await res.json();
+        sel.innerHTML = '<option value="">Selecione um fornecedor</option>' + (data.map ? data.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('') : '');
+    }catch(e){ sel.innerHTML = '<option value="">Erro ao carregar fornecedores</option>'; }
+}
+
+document.getElementById('pedido-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmitPedido');
+    btn.disabled = true;
+    const form = e.currentTarget;
+    const payload = Object.fromEntries(new FormData(form).entries());
+    try{
+        const res = await fetch('/api/orders/index.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ peca: payload.nome_peca || payload.modelo_celular || '', fornecedor_id: parseInt(payload.fornecedor_id||0), observacao: payload.observacoes || '' })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(()=>({error:'Erro'}));
+            alert('Erro ao criar pedido: ' + (err.error||err.message||JSON.stringify(err)));
+        } else {
+            alert('Pedido criado com sucesso.');
+            form.reset();
+        }
+    }catch(err){ alert('Erro ao conectar com o servidor.'); }
+    btn.disabled = false;
+});
+
+loadFornecedores();
+</script>

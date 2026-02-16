@@ -53,39 +53,8 @@
                                             <th class="text-center">Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td><span class="fw-bold">Leo Peças</span></td>
-                                            <td>
-                                                <a href="https://wa.me/5511999999999" target="_blank" class="text-success text-decoration-none">
-                                                    <i class="bi bi-whatsapp me-1"></i> (11) 99999-9999
-                                                </a>
-                                            </td>
-                                            <td>contato@leopecas.com</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-outline-warning" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarFornecedor1">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" title="Excluir" onclick="confirmarExclusao(1)">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td><span class="fw-bold">Distribuidora Silva</span></td>
-                                            <td>
-                                                <a href="https://wa.me/5511888888888" target="_blank" class="text-success text-decoration-none">
-                                                    <i class="bi bi-whatsapp me-1"></i> (11) 88888-8888
-                                                </a>
-                                            </td>
-                                            <td>vendas@silvadist.com.br</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></button>
-                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                            </td>
-                                        </tr>
+                                    <tbody id="fornecedoresTbody">
+                                        <tr><td colspan="5" class="text-center small text-muted">Carregando fornecedores...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -98,7 +67,7 @@
         <div class="modal fade" id="modalNovoFornecedor" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="processar_fornecedor.php?acao=cadastrar" method="POST">
+                    <form id="formNovoFornecedor" action="#" method="POST">
                         <div class="modal-header">
                             <h5 class="modal-title">Cadastrar Novo Fornecedor</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -130,7 +99,7 @@
         <div class="modal fade" id="modalEditarFornecedor1" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="processar_fornecedor.php?acao=editar&id=1" method="POST">
+                    <form id="formEditarFornecedor" action="#" method="POST">
                         <div class="modal-header bg-warning">
                             <h5 class="modal-title text-dark">Editar Fornecedor #1</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -147,7 +116,7 @@
                         </div>
                         <div class="modal-footer text-dark">
                             <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">Sair</button>
-                            <button type="submit" class="btn btn-warning">Atualizar Dados</button>
+                            <button id="btnSalvarEdicao" type="submit" class="btn btn-warning">Atualizar Dados</button>
                         </div>
                     </form>
                 </div>
@@ -155,11 +124,72 @@
         </div>
 
         <script>
-            function confirmarExclusao(id) {
-                if(confirm('Tem certeza que deseja excluir este fornecedor? Todos os pedidos vinculados a ele serão afetados.')) {
-                    window.location.href = 'processar_fornecedor.php?acao=excluir&id=' + id;
-                }
+            const apiFornecedores = {
+                list: async () => fetch('/api/fornecedores/index.php', { credentials: 'same-origin' }).then(r=>r.json()),
+                create: async (data) => fetch('/api/fornecedores/index.php', { method: 'POST', credentials: 'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)}),
+                update: async (id,data) => fetch('/api/fornecedores/item.php?id='+id, { method: 'PUT', credentials: 'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)}),
+                remove: async (id) => fetch('/api/fornecedores/item.php?id='+id, { method: 'DELETE', credentials: 'same-origin' }),
+            };
+
+            async function loadFornecedores(){
+                const tbody = document.getElementById('fornecedoresTbody');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center small text-muted">Carregando...</td></tr>';
+                try{
+                    const data = await apiFornecedores.list();
+                    if (!Array.isArray(data)) { tbody.innerHTML = '<tr><td colspan="5">Erro ao listar fornecedores</td></tr>'; return; }
+                    tbody.innerHTML = data.map(f=>`
+                        <tr>
+                            <td>${f.id}</td>
+                            <td><span class="fw-bold">${f.nome}</span></td>
+                            <td>${f.whatsapp ? `<a href="https://wa.me/${f.whatsapp}" target="_blank" class="text-success text-decoration-none"><i class="bi bi-whatsapp me-1"></i> ${f.whatsapp}</a>` : ''}</td>
+                            <td>${f.email||''}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-warning" onclick="openEdit(${f.id}, ${JSON.stringify(JSON.stringify(f))})"><i class=\"bi bi-pencil\"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="confirmarExclusao(${f.id})"><i class=\"bi bi-trash\"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }catch(e){ tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar fornecedores</td></tr>'; }
             }
+
+            function confirmarExclusao(id) {
+                if(!confirm('Tem certeza que deseja excluir este fornecedor?')) return;
+                apiFornecedores.remove(id).then(r=>{
+                    if (r.ok) loadFornecedores(); else alert('Erro ao excluir');
+                }).catch(()=>alert('Erro ao conectar'));
+            }
+
+            // Novo fornecedor
+            document.getElementById('formNovoFornecedor').addEventListener('submit', async (e)=>{
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+                const res = await apiFornecedores.create(data);
+                if (res.ok) { document.querySelector('#modalNovoFornecedor .btn-close')?.click(); loadFornecedores(); }
+                else { alert('Erro ao criar fornecedor'); }
+            });
+
+            // Editar
+            let currentEditId = null;
+            function openEdit(id, jsonStr) {
+                currentEditId = id;
+                const f = JSON.parse(JSON.parse(jsonStr));
+                const modal = new bootstrap.Modal(document.getElementById('modalEditarFornecedor1'));
+                document.querySelector('#formEditarFornecedor input[name="nome"]').value = f.nome || '';
+                document.querySelector('#formEditarFornecedor input[name="whatsapp"]').value = f.whatsapp || '';
+                document.querySelector('#formEditarFornecedor input[name="email"]').value = f.email || '';
+                modal.show();
+            }
+
+            document.getElementById('formEditarFornecedor').addEventListener('submit', async (e)=>{
+                e.preventDefault();
+                if (!currentEditId) return alert('Nenhum fornecedor selecionado');
+                const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+                const res = await apiFornecedores.update(currentEditId, data);
+                if (res.ok) { document.querySelector('#modalEditarFornecedor1 .btn-close')?.click(); loadFornecedores(); }
+                else alert('Erro ao atualizar');
+            });
+
+            loadFornecedores();
         </script>
 
 <?php include_once __DIR__ . '/includes/footer.php'; ?>

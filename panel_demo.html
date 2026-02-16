@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Painel - Demo integração API</title>
+  <style>body{font-family:Arial,Helvetica,sans-serif;margin:20px}button{margin:4px}</style>
+</head>
+<body>
+  <h2>Demo integração - API local (/api)</h2>
+
+  <section>
+    <h3>Login</h3>
+    <input id="email" placeholder="email" value="admin@example.com" />
+    <input id="senha" placeholder="senha" value="password" type="password" />
+    <button id="btnLogin">Login</button>
+    <button id="btnLogout">Logout</button>
+    <div id="loginResult"></div>
+  </section>
+
+  <section>
+    <h3>Ações</h3>
+    <button id="listUsers">Listar usuários</button>
+    <button id="listOrders">Listar pedidos</button>
+    <button id="listFornecedores">Listar fornecedores</button>
+    <div id="actionResult" style="white-space:pre-wrap;margin-top:10px;background:#f7f7f7;padding:8px;border:1px solid #ddd"></div>
+  </section>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const API = {
+      login: (email, senha) => fetch('/api/auth/login.php', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, senha}) }).then(r=>r.json()),
+      logout: () => fetch('/api/auth/logout.php', { method: 'POST' }),
+      users: () => fetch('/api/auth/users/listall.php', { headers: authHeader() }).then(r=>r.json()),
+      orders: () => fetch('/api/orders/index.php', { headers: authHeader() }).then(r=>r.json()),
+      fornecedores: () => fetch('/api/fornecedores/index.php', { headers: authHeader() }).then(r=>r.json())
+    };
+
+    function authHeader(){
+      const token = localStorage.getItem('panel_api_token');
+      return token ? { 'Authorization': 'Bearer ' + token } : {};
+    }
+
+    $('btnLogin').addEventListener('click', async ()=>{
+      $('loginResult').textContent = 'Aguardando...';
+      try{
+        const email = $('email').value;
+        const senha = $('senha').value;
+        const res = await API.login(email, senha);
+        if (res && res.token) {
+          localStorage.setItem('panel_api_token', res.token);
+          $('loginResult').textContent = 'Logado. Token salvo.';
+        } else if (res && res.user) {
+          // some APIs return user + token nested
+          if (res.user.token) { localStorage.setItem('panel_api_token', res.user.token); $('loginResult').textContent = 'Logado. Token salvo (user.token).'; }
+          else $('loginResult').textContent = JSON.stringify(res);
+        } else {
+          $('loginResult').textContent = JSON.stringify(res);
+        }
+      } catch (e) { $('loginResult').textContent = 'Erro: ' + e; }
+    });
+
+    $('btnLogout').addEventListener('click', async ()=>{
+      localStorage.removeItem('panel_api_token');
+      try { await API.logout(); } catch(e){}
+      $('loginResult').textContent = 'Deslogado.';
+    });
+
+    $('listUsers').addEventListener('click', async ()=>{
+      $('actionResult').textContent = 'Aguardando...';
+      try { const r = await API.users(); $('actionResult').textContent = JSON.stringify(r, null, 2); } catch(e){ $('actionResult').textContent = 'Erro: '+e; }
+    });
+
+    $('listOrders').addEventListener('click', async ()=>{
+      $('actionResult').textContent = 'Aguardando...';
+      try { const r = await API.orders(); $('actionResult').textContent = JSON.stringify(r, null, 2); } catch(e){ $('actionResult').textContent = 'Erro: '+e; }
+    });
+
+    $('listFornecedores').addEventListener('click', async ()=>{
+      $('actionResult').textContent = 'Aguardando...';
+      try { const r = await API.fornecedores(); $('actionResult').textContent = JSON.stringify(r, null, 2); } catch(e){ $('actionResult').textContent = 'Erro: '+e; }
+    });
+  </script>
+</body>
+</html>
