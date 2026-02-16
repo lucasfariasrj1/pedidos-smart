@@ -63,6 +63,17 @@ $currentRoute = $url ?? '';
             <p>Configurações</p>
           </a>
         </li>
+
+
+                <li class="nav-header">CONTA</li>
+
+        <li class="nav-item">
+          <a href="<?= $baseUrl; ?>/logout.php" class="nav-link text-danger">
+            <i class="nav-icon bi bi-box-arrow-right"></i>
+            <p>Sair do Sistema</p>
+          </a>
+        </li>
+
       </ul>
     </nav>
   </div>
