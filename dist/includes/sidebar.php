@@ -1,23 +1,16 @@
-<?php
-// Define a página atual para marcar o menu como ativo
-$currentPage = $_GET['page'] ?? 'dashboard';
-// Recupera o papel do usuário da sessão (ajuste conforme seu sistema de login)
-$userRole = $_SESSION['role'] ?? 'usuario'; 
-?>
-
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
   <div class="sidebar-brand">
-    <a href="index.php?page=dashboard" class="brand-link">
+    <a href="{{ route('dashboard') }}" class="brand-link">
+      <!-- <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="brand-image opacity-75 shadow" /> -->
       <span class="brand-text fw-light">Sistema de Pedidos</span>
     </a>
   </div>
-
   <div class="sidebar-wrapper">
     <nav class="mt-2">
       <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false" id="navigation">
         
         <li class="nav-item">
-          <a href="index.php?page=dashboard" class="nav-link <?= $currentPage == 'dashboard' ? 'active' : '' ?>">
+          <a href="./" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
             <i class="nav-icon bi bi-speedometer2"></i>
             <p>Dashboard</p>
           </a>
@@ -26,14 +19,14 @@ $userRole = $_SESSION['role'] ?? 'usuario';
         <li class="nav-header">OPERAÇÃO</li>
 
         <li class="nav-item">
-          <a href="index.php?page=pedidos" class="nav-link <?= $currentPage == 'pedidos' ? 'active' : '' ?>">
+          <a href="/pedidos.php" class="nav-link {{ request()->is('pedidos/novo') ? 'active' : '' }}">
             <i class="nav-icon bi bi-plus-circle-fill"></i>
             <p>Fazer Pedido</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="index.php?page=history-pedidos" class="nav-link <?= $currentPage == 'history-pedidos' ? 'active' : '' ?>">
+          <a href="/historicoPedido.php" class="nav-link {{ request()->is('pedidos') ? 'active' : '' }}">
             <i class="nav-icon bi bi-clock-history"></i>
             <p>Histórico de Pedidos</p>
           </a>
@@ -42,15 +35,15 @@ $userRole = $_SESSION['role'] ?? 'usuario';
         <li class="nav-header">GERENCIAMENTO</li>
 
         <li class="nav-item">
-          <a href="index.php?page=fornecedores" class="nav-link <?= $currentPage == 'fornecedores' ? 'active' : '' ?>">
+          <a href="/fornecedores.php" class="nav-link {{ request()->is('fornecedores*') ? 'active' : '' }}">
             <i class="nav-icon bi bi-truck"></i>
             <p>Fornecedores</p>
           </a>
         </li>
 
-        <?php if ($userRole === 'admin'): ?>
-        <li class="nav-item <?= in_array($currentPage, ['usuarios', 'logs', 'settings']) ? 'menu-open' : '' ?>">
-          <a href="#" class="nav-link <?= in_array($currentPage, ['usuarios', 'logs', 'settings']) ? 'active' : '' ?>">
+        <!-- @if(auth()->user()->role === 'admin') -->
+        <li class="nav-item {{ request()->is('admin/*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link">
             <i class="nav-icon bi bi-shield-lock-fill"></i>
             <p>
               Administração
@@ -59,35 +52,38 @@ $userRole = $_SESSION['role'] ?? 'usuario';
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="index.php?page=usuarios" class="nav-link <?= $currentPage == 'usuarios' ? 'active' : '' ?>">
+              <a href="/usuarios.php" class="nav-link {{ request()->is('admin/usuarios*') ? 'active' : '' }}">
                 <i class="nav-icon bi bi-people"></i>
                 <p>Usuários e Lojas</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="index.php?page=logs" class="nav-link <?= $currentPage == 'logs' ? 'active' : '' ?>">
+              <a href="/logs.php" class="nav-link {{ request()->is('admin/logs*') ? 'active' : '' }}">
                 <i class="nav-icon bi bi-journal-text"></i>
                 <p>Logs de Atividade</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="index.php?page=settings" class="nav-link <?= $currentPage == 'settings' ? 'active' : '' ?>">
+              <a href="/configuracoes.php" class="nav-link {{ request()->is('admin/configuracoes*') ? 'active' : '' }}">
                 <i class="nav-icon bi bi-gear"></i>
                 <p>Configurações</p>
               </a>
             </li>
           </ul>
         </li>
-        <?php endif; ?>
+        <!-- @endif -->
 
         <li class="nav-item mt-3">
-          <a href="logout.php" class="nav-link text-danger">
-            <i class="nav-icon bi bi-box-arrow-right"></i>
-            <p>Sair do Sistema</p>
-          </a>
+            <form method="POST" action="{{ route('logout') }}">
+                <!-- @csrf -->
+                <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
+                    <i class="nav-icon bi bi-box-arrow-right text-danger"></i>
+                    <p class="text-danger">Sair do Sistema</p>
+                </button>
+            </form>
         </li>
 
       </ul>
     </nav>
   </div>
-</aside>
+  </aside>
