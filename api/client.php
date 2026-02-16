@@ -22,28 +22,44 @@ function forward_request(string $path) {
         $url .= '?' . $_SERVER['QUERY_STRING'];
     }
 
+    // Collect incoming headers but only forward Authorization explicitly
+    $incoming = function_exists('getallheaders') ? getallheaders() : get_request_headers_fallback();
+    $authHeader = null;
+    foreach ($incoming as $k => $v) {
+        if (strtolower($k) === 'authorization') { $authHeader = $v; break; }
+    }
+
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HEADER, true);
 
-    $rawHeaders = function_exists('getallheaders') ? getallheaders() : get_request_headers_fallback();
-    $outHeaders = [];
-    foreach ($rawHeaders as $k => $v) {
-        if (strtolower($k) === 'host') continue;
-        $outHeaders[] = $k . ': ' . $v;
+    // Prepare default headers to avoid not-allowed issues
+    $outHeaders = [
+        'Content-Type: application/json',
+        'User-Agent: orcafacil-proxy/1.0'
+    ];
+    if ($authHeader) $outHeaders[] = 'Authorization: ' . $authHeader;
+
+    $body = null;
+    if (in_array($method, ['POST','PUT','PATCH','DELETE'])) {
+        $raw = file_get_contents('php://input');
+        // Send raw body as-is (assume JSON)
+        $body = $raw === false ? null : $raw;
     }
 
-    if (in_array($method, ['POST','PUT','PATCH'])) {
-        $body = file_get_contents('php://input');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        $hasCT = false;
-        foreach ($outHeaders as $h) if (stripos($h, 'content-type:') === 0) $hasCT = true;
-        if (!$hasCT) $outHeaders[] = 'Content-Type: application/json';
-    }
+    $curlOptions = [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_HEADER => true,
+        CURLOPT_HTTPHEADER => $outHeaders,
+    ];
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $outHeaders);
+    if ($body !== null) $curlOptions[CURLOPT_POSTFIELDS] = $body;
+
+    curl_setopt_array($ch, $curlOptions);
 
     $resp = curl_exec($ch);
     if ($resp === false) {
