@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       ]);
 
       // Redireciona pro dashboard
-      header("Location: " . rtrim(BASE_URL, "/") . "/dist/index.php?page=dashboard");
+      header("Location: " . rtrim(BASE_URL, "/") . "/index.php?page=dashboard");
       exit;
     }
   }
