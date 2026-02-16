@@ -1,4 +1,5 @@
 <?php
+define('API_BASE_URL', 'https://api.assistenciasmarthard.com.br');
 
 if (!function_exists('apiBaseUrl')) {
     function apiBaseUrl(): string
