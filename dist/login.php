@@ -1,7 +1,7 @@
 <?php
-include_once __DIR__ . '/config.php';
-include_once __DIR__ . '/auth_check.php';
-include_once __DIR__ . '/api/auth.php';
+include_once __DIR__ . '/includes/config.php';
+include_once __DIR__ . '/includes/auth_check.php';
+include_once __DIR__ . '/includes/api/auth.php';
 ?>
 <!doctype html>
 <html lang="pt-br">
