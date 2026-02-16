@@ -1,26 +1,20 @@
 <?php
 
-require_once __DIR__ . '/../model/loja.php';
+require_once __DIR__ . '/../model/Fornecedor.php';
 
-class LojaController
+class FornecedorController
 {
-    private Loja $model;
+    private Fornecedor $model;
     private LogController $log;
 
     public function __construct(PDO $db, LogController $log)
     {
-        $this->model = new Loja($db);
+        $this->model = new Fornecedor($db);
         $this->log = $log;
     }
 
     public function handle(string $metodo, ?int $id, array $user): void
     {
-        if (($user['role'] ?? 'usuario') !== 'admin') {
-            http_response_code(403);
-            echo json_encode(['error' => 'Apenas admin pode gerenciar lojas']);
-            return;
-        }
-
         switch ($metodo) {
             case 'GET':
                 echo json_encode($this->model->all());
@@ -29,9 +23,9 @@ class LojaController
             case 'POST':
                 $data = json_decode(file_get_contents('php://input'), true) ?? [];
                 if ($this->model->create($data)) {
-                    $this->log->registrar($user['id'], 'LOJA_CREATE', 'Loja cadastrada: ' . ($data['nome'] ?? ''));
+                    $this->log->registrar($user['id'] ?? null, 'FORNECEDOR_CREATE', 'Fornecedor criado: ' . ($data['nome'] ?? ''));
                     http_response_code(201);
-                    echo json_encode(['message' => 'Loja criada']);
+                    echo json_encode(['message' => 'Fornecedor criado']);
                     return;
                 }
                 break;
@@ -45,8 +39,8 @@ class LojaController
 
                 $data = json_decode(file_get_contents('php://input'), true) ?? [];
                 if ($this->model->update($id, $data)) {
-                    $this->log->registrar($user['id'], 'LOJA_UPDATE', 'Loja atualizada ID: ' . $id);
-                    echo json_encode(['message' => 'Loja atualizada']);
+                    $this->log->registrar($user['id'] ?? null, 'FORNECEDOR_UPDATE', 'Fornecedor atualizado ID: ' . $id);
+                    echo json_encode(['message' => 'Fornecedor atualizado']);
                     return;
                 }
                 break;
@@ -59,8 +53,8 @@ class LojaController
                 }
 
                 if ($this->model->delete($id)) {
-                    $this->log->registrar($user['id'], 'LOJA_DELETE', 'Loja removida ID: ' . $id);
-                    echo json_encode(['message' => 'Loja removida']);
+                    $this->log->registrar($user['id'] ?? null, 'FORNECEDOR_DELETE', 'Fornecedor removido ID: ' . $id);
+                    echo json_encode(['message' => 'Fornecedor removido']);
                     return;
                 }
                 break;
