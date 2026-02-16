@@ -1,25 +1,3 @@
-<?php include_once __DIR__ . '/includes/header.php'; ?>
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
-            <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
-                    </li>
-                    <li class="nav-item d-none d-md-block"><a href="dashboard" class="nav-link">Home</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="nav-link text-primary fw-bold"><i class="bi bi-gear-fill me-1"></i> Painel de Controle</span>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        
-        <?php include_once __DIR__ . '/includes/sidebar.php'; ?>
-        
-        <main class="app-main">
             <div class="app-content-header">
                 <div class="container-fluid">
                     <div class="row">
@@ -33,7 +11,7 @@
             <div class="app-content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-12 col-lg-8">
                             <div class="card shadow-sm mb-4">
                                 <div class="card-header">
                                     <h3 class="card-title fw-bold text-primary">Informações da Empresa</h3>
@@ -74,7 +52,8 @@ Aguardamos confirmação.</textarea>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
-                                    <table class="table table-hover align-middle mb-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -104,12 +83,13 @@ Aguardamos confirmação.</textarea>
                                                 </td>
                                             </tr>
                                         </tbody>
-                                    </table>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-12 col-lg-4">
                             <div class="card shadow-sm bg-primary text-white mb-4">
                                 <div class="card-body">
                                     <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i> Status do Sistema</h5>
@@ -133,32 +113,4 @@ Aguardamos confirmação.</textarea>
                     </div>
                 </div>
             </div>
-        </main>
-
-        <div class="modal fade" id="modalNovaLoja" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content shadow-lg border-0">
-                    <form action="processar_loja.php" method="POST">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title">Cadastrar Nova Unidade</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nome da Loja</label>
-                                <input type="text" name="nome_loja" class="form-control" placeholder="Ex: Loja 3 - Shopping" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Endereço/Referência</label>
-                                <input type="text" name="endereco" class="form-control" placeholder="Ex: Av. Brasil, s/n">
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light">
-                            <button type="submit" class="btn btn-primary">Salvar Loja</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+        
