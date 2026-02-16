@@ -5,10 +5,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Destrói todos os dados da sessão
+$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+setcookie('jwt_token', '', [
+    'expires' => time() - 3600,
+    'path' => '/',
+    'secure' => $secure,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+
 $_SESSION = [];
 session_destroy();
 
-// Redireciona para login
-header('Location: /login.php');
+header('Location: ' . rtrim(BASE_URL, '/') . '/login.php');
 exit;

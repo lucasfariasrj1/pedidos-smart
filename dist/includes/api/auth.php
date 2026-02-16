@@ -89,8 +89,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "samesite" => "Lax",
       ]);
 
+      if (function_exists('decodeJwtPayload')) {
+        $payload = decodeJwtPayload($token);
+        if (is_array($payload)) {
+          $_SESSION['jwt_payload'] = $payload;
+          $_SESSION['role'] = strtolower((string)($payload['role'] ?? 'user'));
+          $_SESSION['name'] = $payload['name'] ?? 'Usuário';
+          $_SESSION['email'] = $payload['email'] ?? $email;
+        }
+      }
+
       // Redireciona pro dashboard
-      header("Location: " . rtrim(BASE_URL, "/") . "/index.php?page=dashboard");
+      header("Location: " . rtrim(BASE_URL, "/") . "/index.php?url=dashboard");
       exit;
     }
   }

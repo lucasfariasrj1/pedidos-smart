@@ -2,6 +2,11 @@
 include_once __DIR__ . '/includes/config.php';
 include_once __DIR__ . '/includes/auth_check.php';
 include_once __DIR__ . '/includes/api/auth.php';
+
+$reason = $_GET['reason'] ?? '';
+if ($reason === 'expired_token' && empty($loginError)) {
+    $loginError = 'Sua sessão expirou. Faça login novamente.';
+}
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -11,7 +16,13 @@ include_once __DIR__ . '/includes/api/auth.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#007bff" />
+    <meta name="theme-color" content="#0d6efd" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Pedidos SmartHard" />
+    <link rel="manifest" href="<?= rtrim(BASE_URL, '/') ?>/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="<?= rtrim(BASE_URL, '/') ?>/assets/img/AdminLTELogo.png" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
@@ -65,5 +76,13 @@ include_once __DIR__ . '/includes/api/auth.php';
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="<?= rtrim(BASE_URL, '/') ?>/dist/js/adminlte.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('<?= rtrim(BASE_URL, '/') ?>/sw.js').catch(() => {
+          });
+        });
+      }
+    </script>
   </body>
 </html>
