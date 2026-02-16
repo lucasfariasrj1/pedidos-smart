@@ -12,7 +12,7 @@ if (!function_exists('apiBaseUrl')) {
             return rtrim($envUrl, '/');
         }
 
-        return 'http://localhost:3000';
+        return 'https://api.assistenciasmarthard.com.br';
     }
 }
 
