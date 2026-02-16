@@ -29,35 +29,22 @@
         <div class="card-body login-card-body rounded">
           <p class="login-box-msg fw-bold">Acesse sua conta para gerenciar pedidos</p>
           
-          <form id="login-form">
-            
-            <div class="input-group mb-3">
-              <input type="email" name="email" class="form-control" placeholder="E-mail" required autofocus />
-              <div class="input-group-text"><span class="bi bi-envelope"></span></div>
-            </div>
-            
-            <div class="input-group mb-3">
-              <input type="password" name="password" class="form-control" placeholder="Senha" required />
-              <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
-            </div>
+        <form id="login-form">
+          <div class="input-group mb-3">
+            <input type="email" name="email" class="form-control" placeholder="E-mail" required autofocus />
+            <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+          </div>
+          
+          <div class="input-group mb-3">
+            <input type="password" name="senha" class="form-control" placeholder="Senha" required />
+            <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+          </div>
 
-            <div class="row align-items-center">
-              <div class="col-7">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="remember" id="rememberMe" />
-                  <label class="form-check-label" for="rememberMe"> Lembrar-me </label>
-                </div>
-              </div>
-              <div class="col-5">
-                <div class="d-grid gap-2">
-                  <button type="submit" id="btn-entrar" class="btn btn-primary fw-bold">Entrar <i class="bi bi-box-arrow-in-right ms-1"></i></button>
-                </div>
-              </div>
-            </div>
-          </form>
-
-          <div id="login-message" class="mt-3 text-center small"></div>
-
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary fw-bold">Entrar</button>
+          </div>
+        </form>
+        <div id="login-message" class="mt-3 text-center small"></div>
           <div class="mt-4 text-center">
              <p class="mb-0 small text-secondary">Acesso restrito a colaboradores.</p>
           </div>
@@ -69,7 +56,37 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="<?= BASE_URL ?>dist/js/adminlte.js"></script>
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = document.getElementById('login-message');
+    
+    // Captura os dados do formulário
+    const formData = new FormData(e.target);
+    const payload = Object.fromEntries(formData.entries());
 
+    try {
+        const response = await fetch('<?= BASE_URL ?>api/index.php?url=login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) // Envia como JSON conforme o Controller espera
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.token) {
+            // Guarda o token e redireciona
+            localStorage.setItem('jwt_token', data.token);
+            document.cookie = `jwt_token=${data.token}; path=/; max-age=28800`;
+            window.location.href = 'index.php?page=dashboard';
+        } else {
+            message.innerHTML = `<span class="text-danger">${data.error || 'Erro no login'}</span>`;
+        }
+    } catch (error) {
+        message.innerHTML = `<span class="text-danger">Erro ao conectar com o servidor.</span>`;
+    }
+});
+</script>
     <script>
       // Endpoint ajustado para o formato sem URL amigável
       const apiLoginUrl = '/api/index.php?url=login';
