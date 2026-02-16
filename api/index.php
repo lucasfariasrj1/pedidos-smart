@@ -20,8 +20,12 @@ require_once __DIR__ . '/controllers/UsuarioController.php';
 require_once __DIR__ . '/controllers/LojaController.php';
 require_once __DIR__ . '/controllers/SettingController.php';
 
+$rawUrl = $_GET['url'] ?? '';
+$rawUrl = trim((string)$rawUrl, '/');
+$url = $rawUrl === '' ? [] : explode('/', $rawUrl);
+
 $recurso = $url[0] ?? null;
-$id = isset($url[1]) ? (int)$url[1] : null;
+$id = isset($url[1]) && is_numeric($url[1]) ? (int)$url[1] : null;
 $subrecurso = $url[1] ?? null;
 $metodo = $_SERVER['REQUEST_METHOD'];
 

@@ -6,12 +6,12 @@
     <title>Login | Pedidos SmartHard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/adminlte.css" />
+    <link rel="stylesheet" href="<?= BASE_URL ?>dist/css/adminlte.css" />
   </head>
   <body class="login-page bg-body-secondary">
     <div class="login-box">
       <div class="login-logo mb-4">
-        <a href="<?= BASE_URL ?>" class="text-decoration-none text-dark"><b>Pedidos</b> SmartHard</a>
+        <a href="<?= BASE_URL ?>dist/index.php?page=dashboard" class="text-decoration-none text-dark"><b>Pedidos</b> SmartHard</a>
       </div>
       <div class="card card-outline card-primary shadow-lg">
         <div class="card-body login-card-body rounded">
@@ -33,7 +33,7 @@
     </div>
 
     <script>
-      const apiLoginUrl = '../api/login';
+      const apiLoginUrl = '../api/index.php?url=login';
 
       function decodeJwt(token) {
         try {
@@ -70,7 +70,7 @@
 
           message.className = 'mt-3 small text-success';
           message.textContent = 'Login realizado com sucesso. Redirecionando...';
-          window.location.href = 'index';
+          window.location.href = 'index.php?page=dashboard';
         } catch (error) {
           message.className = 'mt-3 small text-danger';
           message.textContent = error.message;

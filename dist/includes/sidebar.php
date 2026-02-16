@@ -1,6 +1,6 @@
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
   <div class="sidebar-brand">
-    <a href="index.php" class="brand-link">
+    <a href="index.php?page=dashboard" class="brand-link">
       <span class="brand-text fw-light">Sistema de Pedidos</span>
     </a>
   </div>
@@ -8,7 +8,7 @@
     <nav class="mt-2">
       <ul class="nav sidebar-menu flex-column" role="navigation" id="navigation">
         <li class="nav-item">
-          <a href="index.php" class="nav-link">
+          <a href="index.php?page=dashboard" class="nav-link">
             <i class="nav-icon bi bi-speedometer2"></i>
             <p>Dashboard</p>
           </a>
@@ -17,14 +17,14 @@
         <li class="nav-header">OPERAÇÃO</li>
 
         <li class="nav-item">
-          <a href="pedidos.php" class="nav-link">
+          <a href="index.php?page=pedidos" class="nav-link">
             <i class="nav-icon bi bi-plus-circle-fill"></i>
             <p>Fazer Pedido</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="historicoPedidos.php" class="nav-link">
+          <a href="index.php?page=history-pedidos" class="nav-link">
             <i class="nav-icon bi bi-clock-history"></i>
             <p>Histórico de Pedidos</p>
           </a>
@@ -33,28 +33,28 @@
         <li class="nav-header">GERENCIAMENTO</li>
 
         <li class="nav-item">
-          <a href="fornecedores.php" class="nav-link">
+          <a href="index.php?page=fornecedores" class="nav-link">
             <i class="nav-icon bi bi-truck"></i>
             <p>Fornecedores</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="usuarios.php" class="nav-link">
+          <a href="index.php?page=usuarios" class="nav-link">
             <i class="nav-icon bi bi-people"></i>
             <p>Usuários</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="settings.php" class="nav-link">
+          <a href="index.php?page=settings" class="nav-link">
             <i class="nav-icon bi bi-shop"></i>
             <p>Lojas</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="logs.php" class="nav-link">
+          <a href="index.php?page=logs" class="nav-link">
             <i class="nav-icon bi bi-journal-text"></i>
             <p>Logs de Atividade</p>
           </a>

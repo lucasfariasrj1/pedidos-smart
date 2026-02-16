@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = '../api/';
+  const API_BASE = '../api/index.php?url=';
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -359,7 +359,7 @@
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('user_payload');
       document.cookie = 'jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      window.location.href = 'login';
+      window.location.href = 'login.php';
     });
   }
 

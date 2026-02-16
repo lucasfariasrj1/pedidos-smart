@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -28,7 +29,7 @@ function decodeJwtPayload(string $jwt): ?array
 $token = $_SESSION['jwt_token'] ?? $_COOKIE['jwt_token'] ?? null;
 
 if (!$token) {
-    header('Location: login');
+    header('Location: login.php');
     exit;
 }
 
@@ -36,7 +37,7 @@ $payload = decodeJwtPayload($token);
 if (!$payload || (!empty($payload['exp']) && (int)$payload['exp'] < time())) {
     setcookie('jwt_token', '', time() - 3600, '/');
     unset($_SESSION['jwt_token'], $_SESSION['user_payload']);
-    header('Location: login');
+    header('Location: login.php');
     exit;
 }
 
@@ -48,18 +49,19 @@ if (isMaintenanceMode() && $role !== 'admin') {
     header('Location: manutencao.php');
     exit;
 }
-$currentPage = basename($_SERVER['PHP_SELF']);
-$adminOnlyPages = ['usuarios.php', 'fornecedores.php', 'settings.php', 'logs.php'];
-$userAllowedPages = ['pedidos.php', 'historicoPedidos.php', 'index.php'];
 
-if ($role !== 'admin' && in_array($currentPage, $adminOnlyPages, true)) {
+$page = trim((string)($_GET['page'] ?? 'dashboard'));
+$adminOnlyPages = ['usuarios', 'fornecedores', 'settings', 'logs'];
+$userAllowedPages = ['dashboard', 'pedidos', 'history-pedidos', 'historico-pedidos'];
+
+if ($role !== 'admin' && in_array($page, $adminOnlyPages, true)) {
     http_response_code(403);
-    header('Location: pedidos');
+    header('Location: index.php?page=dashboard');
     exit;
 }
 
-if ($role !== 'admin' && !in_array($currentPage, $userAllowedPages, true)) {
+if ($role !== 'admin' && !in_array($page, $userAllowedPages, true)) {
     http_response_code(403);
-    header('Location: pedidos');
+    header('Location: index.php?page=dashboard');
     exit;
 }

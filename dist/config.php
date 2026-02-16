@@ -1,10 +1,9 @@
 <?php
 if (!defined('BASE_URL')) {
-    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $project_path = str_replace(basename($_SERVER['PHP_SELF'] ?? ''), '', $_SERVER['PHP_SELF'] ?? '');
 
-    define('BASE_URL', $protocol . '://' . $host . $project_path);
+    define('BASE_URL', $protocol . '://' . $host . '/');
 }
 
 if (!defined('DB_HOST')) {
