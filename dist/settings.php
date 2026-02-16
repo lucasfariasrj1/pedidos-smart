@@ -1,116 +1,137 @@
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Configurações do Sistema</h3>
-                        </div>
-                    </div>
+<?php
+require_once __DIR__ . '/includes/api/profile.php';
+require_once __DIR__ . '/includes/api/lojas.php';
+
+$token = $_COOKIE['jwt_token'] ?? '';
+$message = null;
+$error = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'update_profile') {
+        $response = profileUpdateEndpoint(
+            $token,
+            trim((string) ($_POST['nome'] ?? '')),
+            trim((string) ($_POST['email'] ?? '')),
+        );
+        if ($response['ok']) {
+            $message = $response['data']['message'] ?? 'Perfil atualizado!';
+        } else {
+            $error = $response['data']['message'] ?? 'Erro ao atualizar perfil.';
+        }
+    }
+
+    if ($action === 'create_loja') {
+        $response = lojasCreateEndpoint(
+            $token,
+            trim((string) ($_POST['nome'] ?? '')),
+            trim((string) ($_POST['endereco'] ?? '')),
+        );
+        if ($response['ok']) {
+            $message = $response['data']['message'] ?? 'Loja cadastrada!';
+        } else {
+            $error = $response['data']['message'] ?? 'Erro ao cadastrar loja.';
+        }
+    }
+
+    if ($action === 'update_loja') {
+        $response = lojasUpdateEndpoint(
+            $token,
+            (int) ($_POST['id'] ?? 0),
+            trim((string) ($_POST['nome'] ?? '')),
+            trim((string) ($_POST['endereco'] ?? '')),
+        );
+        if ($response['ok']) {
+            $message = $response['data']['message'] ?? 'Loja atualizada!';
+        } else {
+            $error = $response['data']['message'] ?? 'Erro ao atualizar loja.';
+        }
+    }
+
+    if ($action === 'delete_loja') {
+        $response = lojasDeleteEndpoint($token, (int) ($_POST['id'] ?? 0));
+        if ($response['ok']) {
+            $message = $response['data']['message'] ?? 'Loja deletada!';
+        } else {
+            $error = $response['data']['message'] ?? 'Erro ao deletar loja.';
+        }
+    }
+}
+
+$profileResponse = profileGetEndpoint($token);
+$profile = $profileResponse['ok'] && is_array($profileResponse['data']) ? $profileResponse['data'] : [];
+
+$lojasResponse = lojasListAllEndpoint($token);
+$lojas = $lojasResponse['ok'] && is_array($lojasResponse['data']) ? $lojasResponse['data'] : [];
+?>
+<div class="app-content-header">
+    <div class="container-fluid">
+        <h3 class="mb-0">Configurações</h3>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
+        <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h3 class="card-title">Meu Perfil (API /profile)</h3></div>
+            <div class="card-body">
+                <form method="POST" class="row g-2">
+                    <input type="hidden" name="action" value="update_profile">
+                    <div class="col-md-5"><input class="form-control" name="nome" value="<?= htmlspecialchars((string) ($profile['nome'] ?? $profile['name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required></div>
+                    <div class="col-md-5"><input class="form-control" name="email" type="email" value="<?= htmlspecialchars((string) ($profile['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required></div>
+                    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Salvar</button></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header"><h3 class="card-title">Lojas (API /lojas)</h3></div>
+            <div class="card-body">
+                <form method="POST" class="row g-2 mb-3">
+                    <input type="hidden" name="action" value="create_loja">
+                    <div class="col-md-4"><input class="form-control" name="nome" placeholder="Nome da loja" required></div>
+                    <div class="col-md-6"><input class="form-control" name="endereco" placeholder="Endereço" required></div>
+                    <div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit">Adicionar</button></div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>ID</th><th>Nome</th><th>Endereço</th><th>Ações</th></tr></thead>
+                        <tbody>
+                            <?php if (!$lojas): ?>
+                                <tr><td colspan="4" class="text-center text-muted">Nenhuma loja retornada.</td></tr>
+                            <?php else: foreach ($lojas as $loja): ?>
+                                <tr>
+                                    <td><?= (int) ($loja['id'] ?? 0); ?></td>
+                                    <td><?= htmlspecialchars((string) ($loja['nome'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?= htmlspecialchars((string) ($loja['endereco'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td>
+                                        <details>
+                                            <summary class="btn btn-sm btn-outline-secondary">Editar</summary>
+                                            <form method="POST" class="d-flex gap-2 mt-2">
+                                                <input type="hidden" name="action" value="update_loja">
+                                                <input type="hidden" name="id" value="<?= (int) ($loja['id'] ?? 0); ?>">
+                                                <input class="form-control form-control-sm" name="nome" value="<?= htmlspecialchars((string) ($loja['nome'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required>
+                                                <input class="form-control form-control-sm" name="endereco" value="<?= htmlspecialchars((string) ($loja['endereco'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" required>
+                                                <button class="btn btn-sm btn-outline-primary" type="submit">Salvar</button>
+                                            </form>
+                                        </details>
+                                        <form method="POST" class="mt-1" onsubmit="return confirm('Excluir loja?');">
+                                            <input type="hidden" name="action" value="delete_loja">
+                                            <input type="hidden" name="id" value="<?= (int) ($loja['id'] ?? 0); ?>">
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <div class="app-content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12 col-lg-8">
-                            <div class="card shadow-sm mb-4">
-                                <div class="card-header">
-                                    <h3 class="card-title fw-bold text-primary">Informações da Empresa</h3>
-                                </div>
-                                <form action="processar_settings.php" method="POST">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">Nome do Sistema/Empresa</label>
-                                                <input type="text" name="app_name" class="form-control" value="Sistema de Pedidos Peças">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">E-mail de Suporte</label>
-                                                <input type="email" name="app_email" class="form-control" value="admin@empresa.com">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold">Mensagem Padrão do WhatsApp</label>
-                                            <textarea name="wa_template" class="form-control" rows="4">Olá! Segue novo pedido realizado via sistema:
-{LISTA_DE_ITENS}
-Aguardamos confirmação.</textarea>
-                                            <small class="text-muted">Use <strong>{LISTA_DE_ITENS}</strong> para onde os produtos devem aparecer.</small>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-white text-end">
-                                        <button type="submit" class="btn btn-primary px-4">Salvar Alterações</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="card shadow-sm">
-                                <div class="card-header border-0">
-                                    <h3 class="card-title fw-bold">Lojas Cadastradas</h3>
-                                    <div class="card-tools">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalNovaLoja">
-                                            <i class="bi bi-house-add me-1"></i> Adicionar Loja
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Nome da Unidade</th>
-                                                <th>Localização</th>
-                                                <th>Status</th>
-                                                <th class="text-end px-4">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td><strong>Loja 1 - São Judas</strong></td>
-                                                <td>Av. Principal, 1000</td>
-                                                <td><span class="badge text-bg-success">Ativa</span></td>
-                                                <td class="text-end px-4">
-                                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td><strong>Loja 2 - Centro</strong></td>
-                                                <td>Rua das Flores, 50</td>
-                                                <td><span class="badge text-bg-success">Ativa</span></td>
-                                                <td class="text-end px-4">
-                                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <div class="card shadow-sm bg-primary text-white mb-4">
-                                <div class="card-body">
-                                    <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i> Status do Sistema</h5>
-                                    <p class="mb-1"><strong>PHP:</strong> 8.2.0</p>
-                                    <p class="mb-1"><strong>Banco de Dados:</strong> Conectado</p>
-                                    <p class="mb-1"><strong>Espaço em Disco:</strong> 85% Livre</p>
-                                    <hr class="bg-white opacity-25">
-                                    <p class="mb-0 small italic">Último backup: Hoje, 04:00 AM</p>
-                                </div>
-                            </div>
-
-                            <div class="card shadow-sm border-0">
-                                <div class="card-body text-center py-4">
-                                    <i class="bi bi-shield-check text-success display-4 mb-3 d-block"></i>
-                                    <h5 class="fw-bold">Manutenção</h5>
-                                    <p class="text-muted small">Ative o modo de manutenção para realizar atualizações de banco de dados.</p>
-                                    <button class="btn btn-outline-danger w-100 mt-2">Ativar Modo Manutenção</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
+        </div>
+    </div>
+</div>
