@@ -23,5 +23,5 @@ setcookie('jwt_token', '', [
 $_SESSION = [];
 session_destroy();
 
-header('Location: ' . rtrim(BASE_URL, '/') . '/login.php');
+header('Location: ' . rtrim(BASE_URL, '/') . '/login.php?reason=missing_token');
 exit;
