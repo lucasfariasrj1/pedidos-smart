@@ -1,8 +1,14 @@
 <?php
 include_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/api/logout.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+$token = $_COOKIE['jwt_token'] ?? '';
+if ($token !== '') {
+    logoutEndpoint($token);
 }
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
