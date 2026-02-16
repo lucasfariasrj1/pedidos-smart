@@ -5,9 +5,11 @@
         <!--begin::Copyright-->
         <strong>
           Copyright &copy; 2014-2025&nbsp;
-          <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+          <a href="#" class="text-decoration-none">Assistencia SmartHard</a>.
         </strong>
-        All rights reserved.
+        Todos os Direitos Reservados.
+        <a href="https://lf.dev.br/" target="_blank" class="text-decoration-none">LF DEVELOPER</a>.
+
         <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
