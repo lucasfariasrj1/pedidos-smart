@@ -45,7 +45,7 @@ $_SESSION['user_payload'] = $payload;
 
 $role = $payload['role'] ?? 'usuario';
 if (isMaintenanceMode() && $role !== 'admin') {
-    header('Location: manutencao');
+    header('Location: manutencao.php');
     exit;
 }
 $currentPage = basename($_SERVER['PHP_SELF']);

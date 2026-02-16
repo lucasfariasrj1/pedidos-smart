@@ -20,14 +20,8 @@ require_once __DIR__ . '/controllers/UsuarioController.php';
 require_once __DIR__ . '/controllers/LojaController.php';
 require_once __DIR__ . '/controllers/SettingController.php';
 
-$rawPath = $_GET['url'] ?? trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '', '/');
-$url = $rawPath ? explode('/', trim($rawPath, '/')) : [];
-if (($url[0] ?? '') === 'api') {
-    array_shift($url);
-}
-
 $recurso = $url[0] ?? null;
-$id = isset($url[1]) && is_numeric($url[1]) ? (int)$url[1] : null;
+$id = isset($url[1]) ? (int)$url[1] : null;
 $subrecurso = $url[1] ?? null;
 $metodo = $_SERVER['REQUEST_METHOD'];
 
