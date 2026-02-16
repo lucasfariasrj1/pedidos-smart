@@ -3,85 +3,77 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/auth_check.php';
 
-// Obtendo a URL da variável de consulta (configurada no .htaccess)
-// Se não usar .htaccess, a URL seria index.php?url=pedidos
-$url = isset($_GET['url']) ? $_GET['url'] : '';
+// No Nginx, a variável $uri no try_files costuma vir com a barra inicial.
+// O trim($url, '/') é fundamental para que o switch('pedidos') funcione.
+$url = isset($_GET['url']) ? trim($_GET['url'], '/') : '';
 
-// Dados da sessão para controle de acesso
 $userRole = $_SESSION['role'] ?? 'user';
+$lojaId   = $_SESSION['loja_id'] ?? 0;
 
-// Início do Buffer de saída para definir o Title dinamicamente
-ob_start();
+$pageTitle = "Pedidos SmartHard";
+$pageFile = "dashboard_home.php";
 
-$pageContent = '';
-$pageTitle = 'Pedidos SmartHard';
-
-// Roteamento baseado na URL
 switch ($url) {
     case '':
     case 'dashboard':
-        $pageTitle = 'Dashboard | Pedidos SmartHard';
-        $pageContent = 'dashboard_home.php';
+        $pageTitle = "Dashboard | SmartHard";
+        $pageFile = "dashboard_home.php";
         break;
 
     case 'pedidos':
-        $pageTitle = 'Gerenciar Pedidos | Pedidos SmartHard';
-        $pageContent = 'pedidos.php';
+        $pageTitle = "Gerenciar Pedidos | SmartHard";
+        $pageFile = "pedidos.php";
         break;
 
     case 'history-pedidos':
-        $pageTitle = 'Histórico de Pedidos | Pedidos SmartHard';
-        $pageContent = 'historicoPedidos.php';
+        $pageTitle = "Histórico | SmartHard";
+        $pageFile = "historicoPedidos.php";
         break;
 
     case 'usuarios':
         if ($userRole === 'admin') {
-            $pageTitle = 'Gestão de Usuários | Pedidos SmartHard';
-            $pageContent = 'usuarios.php';
+            $pageTitle = "Usuários | SmartHard";
+            $pageFile = "usuarios.php";
         } else {
-            $pageContent = '403.php'; // Ou uma mensagem de erro
+            $pageFile = "403.php"; 
         }
         break;
 
     case 'fornecedores':
         if ($userRole === 'admin') {
-            $pageTitle = 'Fornecedores | Pedidos SmartHard';
-            $pageContent = 'fornecedores.php';
+            $pageTitle = "Fornecedores | SmartHard";
+            $pageFile = "fornecedores.php";
         } else {
-            $pageContent = '403.php';
+            $pageFile = "403.php";
         }
         break;
 
     case 'settings':
-        $pageTitle = 'Minhas Configurações | Pedidos SmartHard';
-        $pageContent = 'settings.php';
+        $pageTitle = "Configurações | SmartHard";
+        $pageFile = "settings.php";
         break;
 
     default:
-        $pageTitle = 'Página Não Encontrada';
-        $pageContent = '404.php';
+        $pageTitle = "404 - Não Encontrado";
+        $pageFile = "404.php";
         break;
 }
 
-// Renderização da estrutura AdminLTE
-include_once __DIR__ . '/includes/header.php'; // O header deve usar a variável $pageTitle
+// Inclusão da estrutura
+include_once __DIR__ . '/includes/header.php';
 include_once __DIR__ . '/includes/sidebar.php';
 
-echo '<main class="app-main">';
-echo '  <div class="app-content-header">';
-echo '    <div class="container-fluid">';
+echo '<main class="app-main"><div class="app-content-header"><div class="container-fluid">';
 
-if (file_exists(__DIR__ . '/' . $pageContent)) {
-    include_once __DIR__ . '/' . $pageContent;
+$fullPath = __DIR__ . '/' . $pageFile;
+
+if (file_exists($fullPath)) {
+    include_once $fullPath;
 } else {
-    echo "<h1>Erro: Arquivo $pageContent não encontrado.</h1>";
+    echo "<h1>Erro: Arquivo {$pageFile} não encontrado.</h1>";
 }
 
-echo '    </div>';
-echo '  </div>';
-echo '</main>';
+echo '</div></div></main>';
 
 include_once __DIR__ . '/includes/footer.php';
-
-ob_end_flush();
 ?>
